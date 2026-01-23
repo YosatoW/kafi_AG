@@ -1,0 +1,29 @@
+//- views/layout.pug
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title
+      block pageTitle
+        | Kafi AG
+    link(rel="stylesheet" href="/css/style.css")
+
+  body
+    .app
+      header.topbar
+        .header-left
+          block headerLeft
+
+        h1.header-title
+          block pageHeader
+            // Fallback: wenn pageHeader nicht überschrieben wird, nimm pageTitle
+            block pageTitle
+              | Kafi AG
+
+        .header-right
+          block headerRight
+
+      block content
+
+    script(src="/js/main.js")

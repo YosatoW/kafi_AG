@@ -1,0 +1,22 @@
+
+extends layout
+
+block pageTitle
+  | Zubereitung
+
+block content
+  main.main.full
+    .panel.card.fill
+      h2= drink.name
+
+      .progress
+        .bar#brew-bar(style="width:0%")
+
+      p#brew-msg Zubereitung läuft…
+
+      .cup-illustration#cup-remove.hidden
+        .cup-icon 🥤
+        h3 Bitte Getränk entnehmen
+
+  script.
+    window.__BREW_CONTEXT__ = { drinkId: "!{drink.id}" };

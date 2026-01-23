@@ -1,0 +1,358 @@
+
+/* ========================================================================== */
+/* 0. ROOT VARIABLES                                                          */
+/* ========================================================================== */
+
+:root {
+  --bg: #0f1115;
+  --fg: #e6e6e6;
+  --accent: #2aa198;
+  --warn: #ff6b6b;
+  --ok: #51cf66;
+  --info: #74c0fc;
+  --card: #171a22;
+}
+
+/* ========================================================================== */
+/* 1. GLOBAL                                                                  */
+/* ========================================================================== */
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, Segoe UI, Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Buttons */
+.btn {
+  background: var(--accent);
+  color:#0a0b0f;
+  border:none;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.btn.small { padding:6px 10px; font-size:.9rem; }
+.btn.primary { background: #ffd43b; }
+
+/* ========================================================================== */
+/* 2. TOPBAR / BADGES                                                         */
+/* ========================================================================== */
+.topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 16px 20px;
+  background: #131621;
+  border-bottom: 1px solid #202434;
+}
+
+.header-title {
+  text-align: center;
+  justify-self: center;
+  width: auto;
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  gap: 10px;
+}
+
+.header-left {
+  justify-self: start;
+}
+
+.header-right {
+  justify-self: end;
+}
+
+
+.badge {
+  padding:6px 10px;
+  border-radius:12px;
+  margin-left:8px;
+  font-size:.9rem;
+}
+.badge.ok   { background:#16351c; color:var(--ok); }
+.badge.warn { background:#3a1414; color:var(--warn); }
+.badge.info { background:#132a3a; color:var(--info); }
+
+/* ========================================================================== */
+/* 3. MAIN LAYOUT                                                             */
+/* ========================================================================== */
+
+.main {
+  display:grid;
+  gap:18px;
+  padding:18px;
+  grid-template-columns: 2fr 1fr;
+}
+
+/* DRINK GRID */
+.drinks {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  padding: 10px 0;
+}
+
+.drink-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+/* DRINK CARD */
+.card {
+  background: var(--card);
+  padding:16px;
+  border-radius:12px;
+  border:1px solid #202434;
+}
+
+.card.drink {
+  text-align:left;
+  cursor:pointer;
+  display:block;
+  color:inherit;
+  text-decoration:none;
+  padding: 20px;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.card.drink.disabled {
+  opacity:.45;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
+.card.drink .title {
+  font-weight:700;
+  font-size:1.2rem;
+  margin-bottom:10px;
+  min-height: 32px;
+}
+
+.card.drink .price {
+  opacity:.9;
+  font-size:1rem;
+}
+
+/* ========================================================================== */
+/* 4. INPUTS / LINES                                                          */
+/* ========================================================================== */
+
+input[type="number"],
+input[type="password"] {
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #2a2f45;
+  background:#0f121a;
+  color:var(--fg);
+}
+
+/* ========================================================================== */
+/* 5. FULLSCREEN PAY/BREW                                                     */
+/* ========================================================================== */
+
+.main.full {
+  grid-template-columns: 1fr;
+  padding: 24px;
+}
+
+.panel.card.fill {
+  width: 100%;
+  max-width: 100%;
+}
+.panel.card.fill h2 {
+  margin-top: 0;
+}
+
+/* ========================================================================== */
+/* 6. SCREENSAVER                                                             */
+/* ========================================================================== */
+
+.screensaver {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+.screensaver .logo { font-size:120px; }
+
+/* ========================================================================== */
+/* 7. CUP ILLUSTRATION                                                        */
+/* ========================================================================== */
+
+.cup-illustration {
+  margin-top: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px dashed #40485f;
+  background: #121623;
+  text-align: center;
+}
+.cup-illustration .cup-icon {
+  font-size: 120px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.hidden { display:none !important; }
+
+/* ========================================================================== */
+/* 8. ADMIN                                                                   */
+/* ========================================================================== */
+
+.admin .grid {
+  display:grid;
+  gap:16px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+
+/* Einheitliche Breite für alle Inputfelder im Admin */
+.admin input[type="number"],
+.admin input[type="text"],
+.admin select {
+  width: 100%;
+  box-sizing: border-box;
+  height: 30px;          /* gleiche Höhe */
+  font-size: 1rem;
+}
+
+.row {
+  display:grid;
+  gap:10px;
+  grid-template-columns: 1fr 1fr auto auto;
+  align-items:center;
+  margin:8px 0;
+}
+
+/* DRINK BLOCK (Admin) */
+.drink-block {
+  padding: 12px;
+  border:1px solid #202434;
+  border-radius:10px;
+  background:#171a22;
+  margin-bottom:12px;
+}
+
+.drink-block h4 {
+  margin:0 0 8px 0;
+}
+
+/* ========================================================================== */
+/* 9. TOGGLE SWITCH                                                           */
+/* ========================================================================== */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  vertical-align: middle;
+  margin-left: 8px;
+  cursor:pointer;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background-color: #3a3f55;
+  border: 1px solid #2a2f45;
+  border-radius: 24px;
+  transition: background-color .2s ease;
+}
+
+.switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  top: 50%;
+  left: 3px;
+  transform: translateY(-50%);
+  background-color: #cfd2e3;
+  border-radius: 50%;
+  transition: transform .2s ease;
+}
+
+.switch input:checked + .slider {
+  background-color: var(--accent);
+}
+
+.switch input:checked + .slider::before {
+  transform: translate(24px, -50%);
+}
+
+/* ========================================================================== */
+/* 10. WARNZEILE STARTSEITE                                                   */
+/* ========================================================================== */
+
+.alerts {
+  margin: 0 0 10px 0;
+}
+.alerts .badge.warn {
+  display: inline-block;
+}
+
+/* Vollbreite Warnzeile unter dem Header */
+.alert-full {
+  text-align: center;
+  width: 100%;
+  background: #3a1414;
+  color: #ff6b6b;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #552020;
+  font-size: 1rem;
+  border-radius: 0;
+}
+
+
+/* ========================================================================== */
+/* FIX: Toggle + Input Alignment                                               */
+/* ========================================================================== */
+
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.admin input[type="number"] {
+  width: 100%;
+  height: 38px;
+  font-size: 1rem;
+}
+
+/* Progress-Balken bei BREW */
+.progress {
+  background: #0f121a;
+  height: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.progress .bar {
+  height: 10px;
+  width: 0; /* Startzustand */
+  background: linear-gradient(90deg, #52ffa8, #04d);
+  transition: width .1s linear;
+}

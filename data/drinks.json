@@ -1,0 +1,165 @@
+[
+  {
+    "id": "espresso",
+    "name": "Espresso",
+    "price": 2.5,
+    "active": true,
+    "recipe": {
+      "coffee": 40,
+      "milk": 0,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 3,
+      "water": 0
+    }
+  },
+  {
+    "id": "espresso2",
+    "name": "Doppelter Espresso",
+    "price": 3.5,
+    "active": true,
+    "recipe": {
+      "coffee": 80,
+      "milk": 0,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 3,
+      "water": 0
+    }
+  },
+  {
+    "id": "cafeblack",
+    "name": "Café Schwarz",
+    "price": 3.2,
+    "active": true,
+    "recipe": {
+      "coffee": 50,
+      "milk": 5,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 3,
+      "water": 0
+    }
+  },
+  {
+    "id": "cafecreme",
+    "name": "Café Crème",
+    "price": 3.2,
+    "active": true,
+    "recipe": {
+      "coffee": 50,
+      "milk": 0,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 3,
+      "water": 0
+    }
+  },
+  {
+    "id": "flatwhite",
+    "name": "Flat White",
+    "price": 4,
+    "active": true,
+    "recipe": {
+      "coffee": 40,
+      "milk": 120,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 0
+    }
+  },
+  {
+    "id": "cappuccino",
+    "name": "Cappuccino",
+    "price": 3.5,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 120,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 0
+    }
+  },
+  {
+    "id": "latte",
+    "name": "Latte Macchiato",
+    "price": 4,
+    "active": true,
+    "recipe": {
+      "coffee": 25,
+      "milk": 180,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 0
+    }
+  },
+  {
+    "id": "milchkaffee",
+    "name": "Milchkaffee",
+    "price": 3.5,
+    "active": true,
+    "recipe": {
+      "coffee": 25,
+      "milk": 160,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 0
+    }
+  },
+  {
+    "id": "mochaccino",
+    "name": "Mochaccino",
+    "price": 3.8,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 100,
+      "chocolate": 40
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 0
+    }
+  },
+  {
+    "id": "kakaomilch",
+    "name": "Kakao mit Milch",
+    "price": 3.2,
+    "active": true,
+    "recipe": {
+      "coffee": 0,
+      "milk": 180,
+      "chocolate": 80
+    },
+    "config": {
+      "water": 0
+    }
+  },
+  {
+    "id": "hotwater",
+    "name": "Heisses Wasser",
+    "price": 1,
+    "active": true,
+    "recipe": {
+      "coffee": 0,
+      "milk": 0,
+      "chocolate": 0
+    },
+    "config": {
+      "water": 50
+    }
+  }
+]

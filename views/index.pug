@@ -1,0 +1,36 @@
+//- views/index.pug
+extends layout
+
+block pageTitle
+  | Willkommen bei Kafi AG
+
+block headerRight
+  a.btn.small(href="/admin") Admin
+
+block content
+
+  // WARNUNG UNTER DEM HEADER
+  if status.lowStock && status.lowStock.length
+    - const names = { milk:"Milch", coffee:"Kaffee", chocolate:"Schokolade" }
+    .alert-full
+      | Achtung: Mindestbestand unterschritten – 
+      = status.lowStock.map(k => names[k] || k).join(", ")
+
+  else if status.descaleWarning
+    .alert-full
+      | Entkalkung fällig in #{status.descaleIn} Zubereitungen
+
+  // KACHELN
+  main.main.full
+    .drinks
+      each d in drinks
+        if d.active
+          a.card.drink(
+            href=`/pay/${d.id}`
+            class=(!d.available ? 'disabled' : '')
+            data-id=d.id
+          )
+            .title #{d.name}
+            .price #{d.price.toFixed(2)} #{status.currency}
+            if !d.available
+              .note Zutat leer

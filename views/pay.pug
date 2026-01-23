@@ -1,0 +1,39 @@
+//- views/pay.pug
+extends layout
+
+block pageTitle 
+  | Bezahlen
+
+block headerRight
+  a.btn.small(href="/") Zurück
+
+block content
+  .app
+    main.main.full
+      .panel.card.fill
+        h2= `${drink.name} – ${drink.price.toFixed(2)} ${status.currency}`
+
+        .line
+          label Bereits eingeworfen:
+          span#pay-inserted= `${(status.payment.inserted||0).toFixed(2)} ${status.currency}`
+
+        .line
+          label Restbetrag:
+          span#pay-remain 0.00 #{status.currency}
+
+        .line
+          label Retourgeld:
+          span#pay-change= `${(status.payment.change||0).toFixed(2)} ${status.currency}`
+
+        p#pay-info Hinweis: Die Zubereitung startet automatisch, wenn der volle Betrag bezahlt ist und eine Tasse erkannt wird.
+
+        .cup-illustration#cup-missing.hidden
+          .cup-icon 🥤
+          h3 Bitte Tasse hinstellen
+
+    script.
+      window.__PAY_CONTEXT__ = {
+        drinkId: "!{drink.id}",
+        price: !{drink.price},
+        currency: "!{status.currency}"
+      };
