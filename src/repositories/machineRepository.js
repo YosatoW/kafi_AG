@@ -2,7 +2,7 @@
 import fs from 'fs/promises';
 import fssync from 'fs';
 import { DATA_DIR, MACHINE_FILE } from '../config/paths.js';
-import { CURRENCY, SCREENSAVER_TIMEOUT_MS } from '../config/constants.js';
+import { CURRENCY, SCREENSAVER_TIMEOUT_MS, DEFAULT_BREW_MS } from '../config/constants.js';
 
 const DEFAULT_MACHINE = {
   cupPresent: false,
@@ -12,7 +12,7 @@ const DEFAULT_MACHINE = {
   descaleIn: 500,
   descaleWarning: 50,
   payment: { inserted: 0, change: 0 },
-  brewing: { inProgress: false, drinkId: null, etaMs: 4000, startedAt: 0, awaitingCupRemoval: false },
+  brewing: { inProgress: false, drinkId: null, etaMs: DEFAULT_BREW_MS, startedAt: 0, awaitingCupRemoval: false },
   screensaverTimeoutMs: SCREENSAVER_TIMEOUT_MS,
   currency: CURRENCY
 };

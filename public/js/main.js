@@ -87,10 +87,22 @@
     const s = await getStatus();
 
     // UI
-    qs('#pay-inserted').textContent = (s.payment.inserted || 0).toFixed(2) + ' ' + s.currency;
-    qs('#pay-change').textContent   = (s.payment.change   || 0).toFixed(2) + ' ' + s.currency;
-    const remain = Math.max(0, ctx.price - (s.payment.inserted || 0));
-    qs('#pay-remain').textContent   = remain.toFixed(2) + ' ' + s.currency;
+    // qs('#pay-inserted').textContent = (s.payment.inserted || 0).toFixed(2) + ' ' + s.currency;
+    // qs('#pay-change').textContent   = (s.payment.change   || 0).toFixed(2) + ' ' + s.currency;
+    // const remain = Math.max(0, ctx.price - (s.payment.inserted || 0));
+    // qs('#pay-remain').textContent   = remain.toFixed(2) + ' ' + s.currency;
+
+    
+    const inserted = Number(s.payment.inserted || 0);
+    const price    = Number(ctx.price || 0);
+    const remain   = Math.max(0, price - inserted);
+    const predictedChange = Math.max(0, inserted - price); // Prognose für Retourgeld *vor* Start
+
+    qs('#pay-inserted').textContent = inserted.toFixed(2) + ' ' + s.currency;
+    qs('#pay-remain').textContent   = remain.toFixed(2)   + ' ' + s.currency;
+    qs('#pay-change').textContent   = predictedChange.toFixed(2) + ' ' + s.currency;
+
+
 
     const info = qs('#pay-info');
     const cupMissing = qs('#cup-missing');
@@ -129,12 +141,15 @@
   // ───────────────────────────────────────────────────────────────────────────
   // BREW – Fortschritt + Warten auf Tassenentnahme
   // ───────────────────────────────────────────────────────────────────────────
-  function animateBar(durationMs = 4000) {
+  function animateBar(durationMs) {
+    const dur = Number(durationMs)
+    if (!Number.isFinite(dur) || dur <= 0) return;
+
     const bar = qs('#brew-bar');
     if (!bar) return;
     const start = performance.now();
     function step(now) {
-      const p = Math.min(1, (now - start) / durationMs);
+      const p = Math.min(1, (now - start) / dur);
       bar.style.width = Math.floor(p * 100) + '%';
       if (p < 1) state.brewAnimTimer = requestAnimationFrame(step);
     }
@@ -151,7 +166,7 @@
 
     if (s.brewing.inProgress) {
       if (!state.brewAnimTimer) {
-        animateBar(s.brewing.etaMs || 4000);
+        animateBar(s.brewing.etaMs);
         msg.textContent = 'Zubereitung läuft…';
         removeBlock.classList.add('hidden');
       }

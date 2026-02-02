@@ -2,7 +2,7 @@
   "cupPresent": false,
   "ingredients": {
     "milk": 5000,
-    "coffee": 5000,
+    "coffee": 4680,
     "chocolate": 5000
   },
   "max": {
@@ -15,16 +15,16 @@
     "coffee": 500,
     "chocolate": 500
   },
-  "descaleIn": 250,
+  "descaleIn": 242,
   "descaleWarning": 50,
   "payment": {
-    "inserted": 0,
-    "change": 2.5
+    "inserted": 7.5,
+    "change": 0
   },
   "brewing": {
     "inProgress": false,
     "drinkId": null,
-    "etaMs": 4000,
+    "etaMs": 10000,
     "startedAt": 0,
     "awaitingCupRemoval": false
   },
