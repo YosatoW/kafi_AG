@@ -39,4 +39,3 @@ export function renderBrew(drink, machine) {
     data: { drink, status: { brewing: machine.brewing, currency: machine.currency } }
   };
 }
-``

@@ -2,7 +2,7 @@
   "cupPresent": false,
   "ingredients": {
     "milk": 5000,
-    "coffee": 4680,
+    "coffee": 5000,
     "chocolate": 5000
   },
   "max": {
@@ -15,10 +15,10 @@
     "coffee": 500,
     "chocolate": 500
   },
-  "descaleIn": 242,
+  "descaleIn": 500,
   "descaleWarning": 50,
   "payment": {
-    "inserted": 7.5,
+    "inserted": 0,
     "change": 0
   },
   "brewing": {
@@ -28,6 +28,6 @@
     "startedAt": 0,
     "awaitingCupRemoval": false
   },
-  "screensaverTimeoutMs": 60000,
+  "screensaverTimeoutMs": 600000,
   "currency": "CHF"
 }

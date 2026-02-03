@@ -5,8 +5,9 @@ import session from 'express-session';
 import bodyParser from 'body-parser';
 import { VIEWS_DIR, PUBLIC_DIR } from './config/paths.js';
 import { createPublicRoutes } from './routes/publicRoutes.js';
-import { createAdminRoutes } from './routes/adminRoutes.js';
+// import { createAdminRoutes } from './routes/adminRoutes.js';
 import { createApiRoutes } from './routes/apiRoutes.js';
+import { createSuperuserRoutes } from './routes/superuserRoutes.js';
 
 export function createApp({ drinks, machine }) {
   const app = express();
@@ -19,8 +20,9 @@ export function createApp({ drinks, machine }) {
   app.use(session({ secret: 'hot-beverage-secret', resave: false, saveUninitialized: true }));
 
   app.use(createPublicRoutes(drinks, machine));
-  app.use(createAdminRoutes(drinks, machine));
+  // app.use(createAdminRoutes(drinks, machine));
   app.use(createApiRoutes(drinks, machine));
+  app.use(createSuperuserRoutes(drinks, machine));
 
   return app;
 }

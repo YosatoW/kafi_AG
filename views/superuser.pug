@@ -1,0 +1,116 @@
+//- views/superuser.pug
+extends layout
+
+block pageTitle 
+  | Einstellungen und Verwaltung
+block headerRight
+  a.btn.small(href="/") Zurück
+
+block content
+  .admin
+    // ------------------ Getränke bearbeiten ------------------
+    .grid
+      .card
+        h3 Getränke bearbeiten
+
+        form(method="post" action="/superuser/drinks")
+          .drink-grid
+            each d in drinks
+              .drink-block
+                h4= d.name
+
+                .row
+                  label Aktiv
+                  .switch-wrapper
+                    label.switch
+                      input(type="checkbox" name=`drinks[${d.id}][active]` checked=d.active)
+                      span.slider
+
+                .row
+                  label Preis
+                  input(type="number" name=`drinks[${d.id}][price]` step="0.1" min="0" value=d.price)
+
+                if d.recipe.coffee > 0
+                  .row
+                    label Bohnen (g)
+                    input(type="number" name=`drinks[${d.id}][coffee]` min="0" max="100" value=d.recipe.coffee)
+
+                  .row
+                    label Mahlgrad
+                    input(type="number" name=`drinks[${d.id}][mahlgrad]` min="1" max="10" value=(d.config && d.config.mahlgrad) || 0)
+
+                if d.recipe.milk > 0
+                  .row
+                    label Milch (g)
+                    input(type="number" name=`drinks[${d.id}][milk]` min="0"  max="200" value=d.recipe.milk)
+
+                if d.recipe.chocolate > 0
+                  .row
+                    label Schokolade (g)
+                    input(type="number" name=`drinks[${d.id}][chocolate]` min="0"  max="100" value=d.recipe.chocolate)
+
+                .row
+                  label Wasser (ml)
+                  input(type="number" name=`drinks[${d.id}][water]` min="0"  max="300" value=(d.config && d.config.water) || 0)
+
+          .row(style="justify-content:flex-end; grid-template-columns:auto")
+            button.btn(type="submit") Änderungen speichern
+
+
+    // ------------------ Maschinenstatus ------------------
+    .grid
+      .card
+        h3 Maschinenstatus
+
+
+        .row
+          label Milch (g)
+          span #{machine.ingredients.milk} / #{machine.max.milk}
+
+        .row
+          label Kaffee (g)
+          span #{machine.ingredients.coffee} / #{machine.max.coffee}
+
+        .row
+          label Schokolade (g)
+          span #{machine.ingredients.chocolate} / #{machine.max.chocolate}
+
+
+        .row
+          label Entkalkung in
+          span #{machine.descaleIn} Zubereitungen
+
+        .row(style="justify-content:flex-end; grid-template-columns:auto")
+          form(method="post" action="/superuser/reset-descale")
+            button.btn.small(type="submit") Entkalkung zurücksetzen
+
+
+    // ------------------ Einstellungen ------------------
+    .grid
+      .card
+        h3 Einstellungen
+
+        form(method="post" action="/superuser/settings")
+
+          .row
+            label Mindeststand Milch (g)
+            input(type="number" name="minMilk" min="0" value=machine.minLevels.milk)
+
+          .row
+            label Mindeststand Kaffee (g)
+            input(type="number" name="minCoffee" min="0" value=machine.minLevels.coffee)
+
+          .row
+            label Mindeststand Schokolade (g)
+            input(type="number" name="minChocolate" min="0" value=machine.minLevels.chocolate)
+
+          .row
+            label Entkalkungswarnung ab (Zubereitungen)
+            input(type="number" name="descaleWarning" min="1" value=machine.descaleWarning)
+
+          .row
+            label Screensaver Timeout (Min)
+            input(type="number", name="timeoutMin", min="1", max="10", step="0.1", value=(machine.screensaverTimeoutMs / 60000))
+
+          .row(style="justify-content:flex-end; grid-template-columns:auto")
+            button.btn(type="submit") Speichern

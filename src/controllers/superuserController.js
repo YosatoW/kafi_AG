@@ -3,7 +3,7 @@ import { saveDrinks } from '../repositories/drinksRepository.js';
 import { saveMachine } from '../repositories/machineRepository.js';
 
 export function renderAdmin(drinks, machine) {
-  return { template: 'admin', data: { drinks, machine, currency: machine.currency } };
+  return { template: 'superuser', data: { drinks, machine, currency: machine.currency } };
 }
 
 export function renderSim(machine) {
@@ -15,7 +15,7 @@ export async function postSettings(machine, payload, applySettingsFn) {
 }
 
 export async function postResetDescale(machine) {
-  machine.descaleIn = 250;
+  machine.descaleIn = 500;
   await saveMachine(machine);
 }
 
@@ -38,8 +38,8 @@ export async function postDrinks(drinks, payload) {
     }
 
     if (fields.milk !== undefined) {
-      const ml = Number(fields.milk);
-      if (!Number.isNaN(ml) && ml >= 0) d.recipe.milk = ml;
+      const mk = Number(fields.milk);
+      if (!Number.isNaN(mk) && mk >= 0) d.recipe.milk = mk;
     }
 
     if (fields.chocolate !== undefined) {

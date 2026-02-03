@@ -1,4 +1,4 @@
-
+//- views/sim.pug
 extends layout
 
 block pageTitle 
@@ -11,7 +11,7 @@ block content
   .admin
     .grid
       .card
-        form(method="post" action="/admin/sim")
+        form(method="post" action="/superuser/sim")
           h4 System & Sensoren
 
           .row
@@ -40,11 +40,11 @@ block content
             button.btn(type="submit") Anwenden
 
       .card
-        form(method="post" action="/admin/sim")
+        form(method="post" action="/superuser/sim")
           h4 Zutaten
 
           .row
-            label Milch (ml)
+            label Milch (g)
             input(type="number" name="milk" min="0" value=machine.ingredients.milk)
 
           .row

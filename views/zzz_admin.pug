@@ -41,7 +41,7 @@ block content
 
                 if d.recipe.milk > 0
                   .row
-                    label Milch (ml)
+                    label Milch (g)
                     input(type="number" name=`drinks[${d.id}][milk]` min="0"  max="200" value=d.recipe.milk)
 
                 if d.recipe.chocolate > 0
@@ -51,7 +51,7 @@ block content
 
                 .row
                   label Wasser (ml)
-                  input(type="number" name=`drinks[${d.id}][water]` min="0"  max="200" value=(d.config && d.config.water) || 0)
+                  input(type="number" name=`drinks[${d.id}][water]` min="0"  max="300" value=(d.config && d.config.water) || 0)
 
           .row(style="justify-content:flex-end; grid-template-columns:auto")
             button.btn(type="submit") Änderungen speichern
@@ -64,7 +64,7 @@ block content
 
 
         .row
-          label Milch (ml)
+          label Milch (g)
           span #{machine.ingredients.milk} / #{machine.max.milk}
 
         .row
@@ -93,7 +93,7 @@ block content
         form(method="post" action="/admin/settings")
 
           .row
-            label Mindeststand Milch (ml)
+            label Mindeststand Milch (g)
             input(type="number" name="minMilk" min="0" value=machine.minLevels.milk)
 
           .row
