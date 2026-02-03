@@ -87,12 +87,6 @@
     const s = await getStatus();
 
     // UI
-    // qs('#pay-inserted').textContent = (s.payment.inserted || 0).toFixed(2) + ' ' + s.currency;
-    // qs('#pay-change').textContent   = (s.payment.change   || 0).toFixed(2) + ' ' + s.currency;
-    // const remain = Math.max(0, ctx.price - (s.payment.inserted || 0));
-    // qs('#pay-remain').textContent   = remain.toFixed(2) + ' ' + s.currency;
-
-    
     const inserted = Number(s.payment.inserted || 0);
     const price    = Number(ctx.price || 0);
     const remain   = Math.max(0, price - inserted);
@@ -101,9 +95,6 @@
     qs('#pay-inserted').textContent = inserted.toFixed(2) + ' ' + s.currency;
     qs('#pay-remain').textContent   = remain.toFixed(2)   + ' ' + s.currency;
     qs('#pay-change').textContent   = predictedChange.toFixed(2) + ' ' + s.currency;
-
-
-
     const info = qs('#pay-info');
     const cupMissing = qs('#cup-missing');
 
@@ -202,7 +193,7 @@
       state.screensaverTimeoutMs = s.screensaverTimeoutMs;
       hookInactivity();
       await tickHome();
-      setInterval(tickHome, 1200);
+      setInterval(tickHome, 300);
       return;
     }
 

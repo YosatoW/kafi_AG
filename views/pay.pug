@@ -14,15 +14,15 @@ block content
         h2= `${drink.name} – ${drink.price.toFixed(2)} ${status.currency}`
 
         .line
-          label Bereits eingeworfen:
+          label Guthaben: 
           span#pay-inserted= `${(status.payment.inserted||0).toFixed(2)} ${status.currency}`
 
         .line
-          label Restbetrag:
+          label Restbetrag: 
           span#pay-remain 0.00 #{status.currency}
 
         .line
-          label Retourgeld:
+          label Retourgeld: 
           span#pay-change= `${(status.payment.change||0).toFixed(2)} ${status.currency}`
 
         p#pay-info Hinweis: Die Zubereitung startet automatisch, wenn der volle Betrag bezahlt ist und eine Tasse erkannt wird.

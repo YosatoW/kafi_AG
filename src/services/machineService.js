@@ -23,7 +23,7 @@ export async function setSimValues(machine, payload) {
   if (coffee !== undefined)    machine.ingredients.coffee = toPos(coffee);
   if (chocolate !== undefined) machine.ingredients.chocolate = toPos(chocolate);
   if (descaleIn !== undefined) machine.descaleIn = toPos(descaleIn);
-  if (timeoutMs !== undefined) machine.screensaverTimeoutMs = Math.max(5000, Number(timeoutMs));
+  if (timeoutMs !== undefined) machine.screensaverTimeoutMs = Math.max(1000, Number(timeoutMs));
   machine.cupPresent = (cupPresent === 'on');
 
   if (minMilk !== undefined)      machine.minLevels.milk = toPos(minMilk);
@@ -41,16 +41,19 @@ export async function setSimValues(machine, payload) {
 }
 
 export async function applySettings(machine, payload) {
-  const { minMilk, minCoffee, minChocolate, descaleWarning, timeoutSec } = payload;
+  const { minMilk, minCoffee, minChocolate, descaleWarning, timeoutMin } = payload;
 
   if (minMilk !== undefined)        machine.minLevels.milk = Number(minMilk);
   if (minCoffee !== undefined)      machine.minLevels.coffee = Number(minCoffee);
   if (minChocolate !== undefined)   machine.minLevels.chocolate = Number(minChocolate);
   if (descaleWarning !== undefined) machine.descaleWarning = Number(descaleWarning);
+  if (timeoutMin !== undefined) {
+    let min = (Number(timeoutMin));
+    if (isNaN(min)) min = 1;
 
-  if (timeoutSec !== undefined) {
-    const sec = Math.max(1, Number(timeoutSec));
-    machine.screensaverTimeoutMs = sec * 1000;
+    // Clamp zwischen 1 und 10 Minuten
+    min = Math.min(10, Math.max(1, min));
+    machine.screensaverTimeoutMs = min * 60 * 1000; //Minuten in ms
   }
 
   await saveMachine(machine);

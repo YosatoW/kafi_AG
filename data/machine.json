@@ -28,6 +28,6 @@
     "startedAt": 0,
     "awaitingCupRemoval": false
   },
-  "screensaverTimeoutMs": 30000,
+  "screensaverTimeoutMs": 60000,
   "currency": "CHF"
 }
