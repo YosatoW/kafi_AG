@@ -2,20 +2,24 @@
   "cupPresent": false,
   "ingredients": {
     "milk": 5000,
-    "coffee": 5000,
+    "coffee1": 4680,
+    "coffee2": 4960,
     "chocolate": 5000
   },
   "max": {
     "milk": 5000,
-    "coffee": 5000,
+    "coffee1": 5000,
+    "coffee2": 5000,
     "chocolate": 5000
   },
   "minLevels": {
     "milk": 500,
     "coffee": 500,
-    "chocolate": 500
+    "chocolate": 500,
+    "coffee1": 500,
+    "coffee2": 500
   },
-  "descaleIn": 500,
+  "descaleIn": 490,
   "descaleWarning": 50,
   "payment": {
     "inserted": 0,
@@ -29,5 +33,21 @@
     "awaitingCupRemoval": false
   },
   "screensaverTimeoutMs": 600000,
-  "currency": "CHF"
+  "currency": "CHF",
+  "modules": {
+    "chocolate": false,
+    "secondCoffee": false,
+    "beans": [
+      {
+        "id": "sorte1",
+        "name": "Halli",
+        "priceMod": 0
+      },
+      {
+        "id": "sorte2",
+        "name": "Galli",
+        "priceMod": 0
+      }
+    ]
+  }
 }

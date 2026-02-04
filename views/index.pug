@@ -11,10 +11,9 @@ block content
 
   // WARNUNG UNTER DEM HEADER
   if status.lowStock && status.lowStock.length
-    - const names = { milk:"Milch", coffee:"Kaffee", chocolate:"Schokolade" }
     .alert-full
       | Achtung: Mindestbestand unterschritten – 
-      = status.lowStock.map(k => names[k] || k).join(", ")
+      = status.lowStock.map(item => item.name).join(", ")
 
   else if status.descaleWarning
     .alert-full

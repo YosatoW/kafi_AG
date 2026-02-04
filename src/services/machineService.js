@@ -1,8 +1,10 @@
 // src/services/machineService.js
 import { saveMachine } from '../repositories/machineRepository.js';
 
+// ─── SIMULATION WERTE ÄNDERN ───────────────────────────────────────────────────
 export async function setSimValues(machine, payload) {
   const toPos = v => Math.max(0, Number(v));
+
   const {
     milk, coffee, chocolate, cupPresent, descaleIn, timeoutMs,
     insertAdd, insertSet, resetPayment,
@@ -10,26 +12,55 @@ export async function setSimValues(machine, payload) {
     resetIngredients, resetDescale
   } = payload;
 
+  // ── Migration alter machine.json: coffee1/coffee2 ergänzen, falls fehlen
+  if (!machine.ingredients) machine.ingredients = {};
+  if (machine.ingredients.coffee1 === undefined) {
+    machine.ingredients.coffee1 = Number(machine.ingredients.coffee ?? 0);
+  }
+  if (machine.ingredients.coffee2 === undefined) {
+    machine.ingredients.coffee2 = Number(machine.ingredients.coffee ?? 0);
+  }
+  if (!machine.max) machine.max = {};
+  if (machine.max.coffee1 === undefined) machine.max.coffee1 = Number(machine.max.coffee ?? 0);
+  if (machine.max.coffee2 === undefined) machine.max.coffee2 = Number(machine.max.coffee ?? 0);
+  if (!machine.minLevels) machine.minLevels = {};
+  if (machine.minLevels.coffee1 === undefined) machine.minLevels.coffee1 = Number(machine.minLevels.coffee ?? 0);
+  if (machine.minLevels.coffee2 === undefined) machine.minLevels.coffee2 = Number(machine.minLevels.coffee ?? 0);
+
+  // Reset Ingredients
   if (resetIngredients) {
-    machine.ingredients.milk = machine.max.milk;
-    machine.ingredients.coffee = machine.max.coffee;
+    machine.ingredients.milk      = machine.max.milk;
+    machine.ingredients.coffee    = machine.max.coffee;   // legacy
+    machine.ingredients.coffee1   = machine.max.coffee1;
+    machine.ingredients.coffee2   = machine.max.coffee2;
     machine.ingredients.chocolate = machine.max.chocolate;
   }
-  if (resetDescale) {
-    machine.descaleIn = 20;
-  }
 
-  if (milk !== undefined)      machine.ingredients.milk = toPos(milk);
-  if (coffee !== undefined)    machine.ingredients.coffee = toPos(coffee);
+  // Reset Descale
+  if (resetDescale) machine.descaleIn = 20;
+
+  // Ingredient changes
+  if (milk      !== undefined) machine.ingredients.milk      = toPos(milk);
+  if (coffee    !== undefined) machine.ingredients.coffee    = toPos(coffee);   // legacy, optional
+  if (payload.coffee1 !== undefined) machine.ingredients.coffee1 = toPos(payload.coffee1);
+  if (payload.coffee2 !== undefined) machine.ingredients.coffee2 = toPos(payload.coffee2);
   if (chocolate !== undefined) machine.ingredients.chocolate = toPos(chocolate);
+
+  // Descale
   if (descaleIn !== undefined) machine.descaleIn = toPos(descaleIn);
+
+  // Screensaver
   if (timeoutMs !== undefined) machine.screensaverTimeoutMs = Math.max(1000, Number(timeoutMs));
+
+  // Cup detection
   machine.cupPresent = (cupPresent === 'on');
 
-  if (minMilk !== undefined)      machine.minLevels.milk = toPos(minMilk);
-  if (minCoffee !== undefined)    machine.minLevels.coffee = toPos(minCoffee);
+  // Min levels
+  if (minMilk      !== undefined) machine.minLevels.milk      = toPos(minMilk);
+  if (minCoffee    !== undefined) machine.minLevels.coffee    = toPos(minCoffee);
   if (minChocolate !== undefined) machine.minLevels.chocolate = toPos(minChocolate);
 
+  // Payment
   if (resetPayment === 'on') {
     machine.payment = { inserted: 0, change: 0 };
   } else {
@@ -37,23 +68,74 @@ export async function setSimValues(machine, payload) {
     if (insertAdd) machine.payment.inserted += toPos(insertAdd);
   }
 
+  // ─── MODULE SYSTEM (nur speichern wenn Modul-Formular gesendet wurde) ─────────
+  if (!machine.modules) {
+    machine.modules = {
+      chocolate: true,
+      secondCoffee: false,
+      beans: [
+        { id: 'sorte1', name: 'Sorte 1', priceMod: 0 },
+        { id: 'sorte2', name: 'Sorte 2', priceMod: 0 }
+      ]
+    };
+  }
+
+  // Erkennen ob das Modulformular abgesendet wurde:
+  const isModuleForm =
+    ("modulesForm" in payload) ||            // <── Sentinel
+    ("mod_chocolate" in payload) ||
+    ("mod_secondCoffee" in payload) ||
+    ("beans" in payload);
+
+  if (isModuleForm) {
+    // Checkboxen: "on" → true, sonst false (auch wenn Feld fehlt)
+    machine.modules.chocolate    = payload.mod_chocolate === "on";
+    machine.modules.secondCoffee = payload.mod_secondCoffee === "on";
+
+    // Beans werden nur bei aktiver zweiter Sorte aktualisiert
+    if (machine.modules.secondCoffee) {
+      const beansForm = payload.beans || {};
+      const rawNames = beansForm.name || [];
+      const rawMods  = beansForm.priceMod || [];
+
+      machine.modules.beans = [
+        {
+          id: "sorte1",
+          name: String(rawNames[0] || machine.modules.beans?.[0]?.name || "Sorte 1").trim(),
+          priceMod: 0
+        },
+        {
+          id: "sorte2",
+          name: String(rawNames[1] || machine.modules.beans?.[1]?.name || "Sorte 2").trim(),
+          priceMod: Number(rawMods[1] ?? machine.modules.beans?.[1]?.priceMod ?? 0)
+        }
+      ];
+    }
+    // Wenn zweite Sorte deaktiviert wurde → Beans bewusst NICHT anfassen
+  }
+
   await saveMachine(machine);
 }
 
+// ─── SUPERUSER SETTINGS BEARBEITEN ────────────────────────────────────────────────
 export async function applySettings(machine, payload) {
-  const { minMilk, minCoffee, minChocolate, descaleWarning, timeoutMin } = payload;
+  const {
+    minMilk, minCoffee, minChocolate,
+    descaleWarning, timeoutMin
+  } = payload;
 
-  if (minMilk !== undefined)        machine.minLevels.milk = Number(minMilk);
-  if (minCoffee !== undefined)      machine.minLevels.coffee = Number(minCoffee);
-  if (minChocolate !== undefined)   machine.minLevels.chocolate = Number(minChocolate);
-  if (descaleWarning !== undefined) machine.descaleWarning = Number(descaleWarning);
+  if (minMilk       !== undefined) machine.minLevels.milk      = Number(minMilk);
+  if (minCoffee     !== undefined) machine.minLevels.coffee    = Number(minCoffee);
+  if (minChocolate  !== undefined) machine.minLevels.chocolate = Number(minChocolate);
+
+  if (descaleWarning !== undefined)
+    machine.descaleWarning = Number(descaleWarning);
+
   if (timeoutMin !== undefined) {
-    let min = (Number(timeoutMin));
+    let min = Number(timeoutMin);
     if (isNaN(min)) min = 1;
-
-    // Clamp zwischen 1 und 10 Minuten
-    min = Math.min(10, Math.max(1, min));
-    machine.screensaverTimeoutMs = min * 60 * 1000; //Minuten in ms
+    min = Math.max(1, Math.min(10, min));
+    machine.screensaverTimeoutMs = min * 60 * 1000;
   }
 
   await saveMachine(machine);

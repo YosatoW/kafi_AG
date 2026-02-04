@@ -1,8 +1,4 @@
-
-/* ========================================================================== */
 /* 0. ROOT VARIABLES                                                          */
-/* ========================================================================== */
-
 :root {
   --bg: #0f1115;
   --fg: #e6e6e6;
@@ -13,10 +9,7 @@
   --card: #132249;
 }
 
-/* ========================================================================== */
-/* 1. GLOBAL                                                                  */
-/* ========================================================================== */
-
+/* 1. GLOBAL */
 * { box-sizing: border-box; }
 body {
   margin: 0;
@@ -37,9 +30,7 @@ body {
 .btn.small { padding:6px 10px; font-size:.9rem; }
 .btn.primary { background: #ffd43b; }
 
-/* ========================================================================== */
-/* 2. TOPBAR / BADGES                                                         */
-/* ========================================================================== */
+/* 2. TOPBAR / BADGES */
 .topbar {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -54,7 +45,6 @@ header {
   top: 0;
   z-index: 9999;
 }
-
 
 .header-title {
   text-align: center;
@@ -78,7 +68,6 @@ header {
   justify-self: end;
 }
 
-
 .badge {
   padding:6px 10px;
   border-radius:12px;
@@ -89,10 +78,7 @@ header {
 .badge.warn { background:#3a1414; color:var(--warn); }
 .badge.info { background:#132a3a; color:var(--info); }
 
-/* ========================================================================== */
-/* 3. MAIN LAYOUT                                                             */
-/* ========================================================================== */
-
+/* 3. MAIN LAYOUT */
 .main {
   display:grid;
   gap:18px;
@@ -153,10 +139,7 @@ header {
   font-size:1rem;
 }
 
-/* ========================================================================== */
-/* 4. INPUTS / LINES                                                          */
-/* ========================================================================== */
-
+/* 4. INPUTS / LINES */
 input[type="number"],
 input[type="password"] {
   padding:8px;
@@ -166,10 +149,7 @@ input[type="password"] {
   color:var(--fg);
 }
 
-/* ========================================================================== */
-/* 5. FULLSCREEN PAY/BREW                                                     */
-/* ========================================================================== */
-
+/* 5. FULLSCREEN PAY/BREW */
 .main.full {
   grid-template-columns: 1fr;
   padding: 24px;
@@ -183,10 +163,7 @@ input[type="password"] {
   margin-top: 0;
 }
 
-/* ========================================================================== */
-/* 6. SCREENSAVER                                                             */
-/* ========================================================================== */
-
+/* 6. SCREENSAVER */
 .screensaver {
   height:100vh;
   display:flex;
@@ -197,10 +174,7 @@ input[type="password"] {
 }
 .screensaver .logo { font-size:120px; }
 
-/* ========================================================================== */
 /* 7. CUP ILLUSTRATION                                                        */
-/* ========================================================================== */
-
 .cup-illustration {
   margin-top: 16px;
   padding: 24px;
@@ -216,16 +190,12 @@ input[type="password"] {
 }
 .hidden { display:none !important; }
 
-/* ========================================================================== */
 /* 8. ADMIN                                                                   */
-/* ========================================================================== */
-
 .admin .grid {
   display:grid;
   gap:16px;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
-
 
 /* Einheitliche Breite für alle Inputfelder im Admin */
 .admin input[type="number"],
@@ -258,10 +228,7 @@ input[type="password"] {
   margin:0 0 8px 0;
 }
 
-/* ========================================================================== */
-/* 9. TOGGLE SWITCH                                                           */
-/* ========================================================================== */
-
+/* 9. TOGGLE SWITCH */
 .switch {
   position: relative;
   display: inline-block;
@@ -308,10 +275,8 @@ input[type="password"] {
   transform: translate(24px, -50%);
 }
 
-/* ========================================================================== */
-/* 10. WARNZEILE STARTSEITE                                                   */
-/* ========================================================================== */
 
+/* 10. WARNZEILE STARTSEITE */
 .alerts {
   margin: 0 0 10px 0;
 }
@@ -333,10 +298,7 @@ input[type="password"] {
 }
 
 
-/* ========================================================================== */
-/* FIX: Toggle + Input Alignment                                               */
-/* ========================================================================== */
-
+/* FIX: Toggle + Input Alignment */
 .switch-wrapper {
   display: flex;
   align-items: center;
@@ -363,3 +325,35 @@ input[type="password"] {
   background: linear-gradient(90deg, #52ffa8, #04d);
   transition: width .1s linear;
 }
+
+
+/* ────────────────────────────────────────────────────────────── */
+/* Bean-Selection Cards                                           */
+/* ────────────────────────────────────────────────────────────── */
+.bean-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap:12px;
+}
+.bean-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid #2a355a;
+  background:#1b2440;
+  cursor:pointer;
+  transition:transform .08s ease, background .15s ease, border-color .15s ease;
+}
+.bean-card:hover{ background:#22305b; border-color:#35508a; }
+.bean-card.checked{ border-color: var(--accent); background:#1c2f4e; }
+.bean-card input{ display:none; }
+
+.bean-icon{
+  font-size:28px;
+  line-height:1;
+}
+.bean-meta{ display:flex; flex-direction:column; }
+.bean-name{ font-weight:700; }
+.bean-extra{ font-size:.9rem; opacity:.85; }

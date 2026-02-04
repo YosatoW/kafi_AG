@@ -6,15 +6,22 @@ import { CURRENCY, SCREENSAVER_TIMEOUT_MS, DEFAULT_BREW_MS } from '../config/con
 
 const DEFAULT_MACHINE = {
   cupPresent: false,
-  ingredients: { milk: 5000, coffee: 5000, chocolate: 5000 },
-  max:         { milk: 5000, coffee: 5000, chocolate: 5000 },
-  minLevels:   { milk: 500,  coffee: 500,  chocolate: 500  },
+  ingredients: { milk: 5000, coffee1: 5000, coffee2: 5000, chocolate: 5000 },
+  max:         { milk: 5000, coffee1: 5000, coffee2: 5000, chocolate: 5000 },
+  minLevels:   { milk: 500,  coffee1: 500,  coffee2: 500, chocolate: 500  },
   descaleIn: 500,
   descaleWarning: 50,
   payment: { inserted: 0, change: 0 },
   brewing: { inProgress: false, drinkId: null, etaMs: DEFAULT_BREW_MS, startedAt: 0, awaitingCupRemoval: false },
   screensaverTimeoutMs: SCREENSAVER_TIMEOUT_MS,
-  currency: CURRENCY
+  currency: CURRENCY,
+  modules: {
+  chocolate: true,
+  secondCoffee: false,
+  beans: [
+    { id: 'arabica', name: 'Arabica', priceMod: 0.00 },
+    { id: 'robusta', name: 'Robusta', priceMod: 0.20 }
+  ]}
 };
 
 export async function ensureMachineFile() {

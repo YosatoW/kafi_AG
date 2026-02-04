@@ -54,28 +54,62 @@ block content
                   input(type="number" name=`drinks[${d.id}][water]` min="0"  max="300" value=(d.config && d.config.water) || 0)
 
           .row(style="justify-content:flex-end; grid-template-columns:auto")
-            button.btn(type="submit") Änderungen speichern
-
+            button.btn(type="submit") Speichern
 
     // ------------------ Maschinenstatus ------------------
     .grid
       .card
         h3 Maschinenstatus
 
+        // KAFFEE
+        if machine.modules && machine.modules.secondCoffee
 
+          // Kaffee 1 - immer aktiv
+          .row
+            label Kaffee 1 (g)
+            span #{machine.ingredients.coffee1} / #{machine.max.coffee1}
+
+          .row
+            label Sorte 1
+            input(type="text", name="beans[name][]" value=machine.modules.beans[0].name)
+
+          // Kaffee 2 nur wenn Modul aktiv
+          .row
+            label Kaffee 2 (g)
+            span #{machine.ingredients.coffee2} / #{machine.max.coffee2}
+
+          .row
+            label Sorte 2
+            input(type="text", name="beans[name][]" value=machine.modules.beans[1].name)
+
+          .row
+            label Preisaufschlag 2
+            input(type="number", step="0.05", name="beans[priceMod][]" value=machine.modules.beans[1].priceMod)
+
+          // SPEICHERN (Kaffeesorten / Module)
+          form(method="post" action="/superuser/sim")
+            input(type="hidden" name="mod_chocolate" value=(machine.modules && machine.modules.chocolate) ? 'on' : '')
+            input(type="hidden" name="mod_secondCoffee" value=(machine.modules && machine.modules.secondCoffee) ? 'on' : '')
+            .row(style="justify-content:flex-end; grid-template-columns:auto")
+              button.btn.small(type="submit") Speichern
+
+        else
+          .row
+            label Kaffee (g)
+            span #{machine.ingredients.coffee1} / #{machine.max.coffee1}
+
+        // MILCH
         .row
           label Milch (g)
           span #{machine.ingredients.milk} / #{machine.max.milk}
 
-        .row
-          label Kaffee (g)
-          span #{machine.ingredients.coffee} / #{machine.max.coffee}
+        // KAKAO – nur wenn Modul aktiv
+        if machine.modules && machine.modules.chocolate
+          .row
+            label Kakao (g)
+            span #{machine.ingredients.chocolate} / #{machine.max.chocolate}
 
-        .row
-          label Schokolade (g)
-          span #{machine.ingredients.chocolate} / #{machine.max.chocolate}
-
-
+        // ENTKALKUNG + BUTTON
         .row
           label Entkalkung in
           span #{machine.descaleIn} Zubereitungen
@@ -83,7 +117,6 @@ block content
         .row(style="justify-content:flex-end; grid-template-columns:auto")
           form(method="post" action="/superuser/reset-descale")
             button.btn.small(type="submit") Entkalkung zurücksetzen
-
 
     // ------------------ Einstellungen ------------------
     .grid
@@ -100,9 +133,10 @@ block content
             label Mindeststand Kaffee (g)
             input(type="number" name="minCoffee" min="0" value=machine.minLevels.coffee)
 
-          .row
-            label Mindeststand Schokolade (g)
-            input(type="number" name="minChocolate" min="0" value=machine.minLevels.chocolate)
+          if machine.modules && machine.modules.chocolate
+            .row
+              label Mindeststand Schokolade (g)
+              input(type="number" name="minChocolate" min="0" value=machine.minLevels.chocolate)
 
           .row
             label Entkalkungswarnung ab (Zubereitungen)

@@ -7,12 +7,23 @@ block pageTitle
 block headerRight
   a.btn.small(href="/") Zurück
 
+
 block content
+  - const secondCoffee = locals.secondCoffee;
+  - const beans = locals.beans;
   .app
     main.main.full
       .panel.card.fill
+        // ── Titel
         h2= `${drink.name} – ${drink.price.toFixed(2)} ${status.currency}`
 
+        p#pay-info Hinweis: Die Zubereitung startet automatisch, wenn der volle Betrag bezahlt ist und eine Tasse erkannt wird.
+
+        .cup-illustration#cup-missing.hidden
+          .cup-icon 🥤
+          h3 Bitte Tasse hinstellen
+          
+        // ── PAYMENT-BLOCK (immer zuerst)
         .line
           label Guthaben: 
           span#pay-inserted= `${(status.payment.inserted||0).toFixed(2)} ${status.currency}`
@@ -25,15 +36,40 @@ block content
           label Retourgeld: 
           span#pay-change= `${(status.payment.change||0).toFixed(2)} ${status.currency}`
 
-        p#pay-info Hinweis: Die Zubereitung startet automatisch, wenn der volle Betrag bezahlt ist und eine Tasse erkannt wird.
 
-        .cup-illustration#cup-missing.hidden
-          .cup-icon 🥤
-          h3 Bitte Tasse hinstellen
 
+
+        if secondCoffee && drink.recipe.coffee > 0
+          h3(style="margin-top:0") Kaffeesorte wählen
+          #bean-section.card.hidden(style="margin-top:16px;")
+          p#bean-hint(style="margin:0 0 12px 0; opacity:.85")
+            | Bitte Bohne wählen. Ohne Auswahl wird automatisch mit 
+            strong #{beans[0].name}
+            |  in 
+            span#auto-timer 10
+            |  Sekunden gestartet.
+
+          .bean-grid
+            each b, i in beans
+              label.bean-card(class=i===0 ? 'checked' : '')
+                input(type="radio", name="bean", value=b.id, checked=(i===0), hidden)
+                .bean-icon(role="img" aria-label="Kaffee") ☕
+                .bean-meta
+                  .bean-name #{b.name}
+                  if b.priceMod && b.priceMod > 0
+                    .bean-extra +#{b.priceMod.toFixed(2)} #{status.currency}
+
+            .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
+              button.btn.primary#manual-continue Weiter
+
+
+    // ── Kontext (muss innerhalb block content bleiben)
     script.
       window.__PAY_CONTEXT__ = {
         drinkId: "!{drink.id}",
         price: !{drink.price},
-        currency: "!{status.currency}"
+        currency: "!{status.currency}",
+        bean: "!{bean || ''}",
+        secondCoffee: !{secondCoffee},
+        recipeCoffee: !{drink.recipe.coffee}
       };

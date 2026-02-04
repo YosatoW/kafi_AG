@@ -5,6 +5,7 @@ import { DEFAULT_BREW_MS } from '../config/constants.js';
 
 export function getStatus(drinks, machine) {
   return {
+    modules: machine.modules,
     cupPresent: machine.cupPresent,
     descaleIn: machine.descaleIn,
     payment: machine.payment,
@@ -18,25 +19,34 @@ export function getStatus(drinks, machine) {
   };
 }
 
-export async function postBrew(drink, machine) {
+export async function postBrew(drink, machine, beanId = null) {
+  const mods = machine.modules || {};
+  if ((drink?.recipe?.coffee || 0) > 0 && mods.secondCoffee) {
+    drink.chosenBean = beanId || 'sorte1';
+  } else {
+    drink.chosenBean = null;
+  }
+
+  // Optionaler Server-Guard (empfohlen)
+  if (!canMake(drink, machine)) {
+    return { ok: false, msg: 'Zutat leer – Getränk derzeit nicht verfügbar.' };
+  }
+
   const pay = moneyState(drink.price, machine);
   if (pay.remain > 0)             return { ok: false, msg: `Bitte noch ${pay.remain.toFixed(2)} ${machine.currency} einwerfen.` };
   if (!machine.cupPresent)        return { ok: false, msg: 'Bitte Tasse hinstellen.' };
-  if (!canMake(drink, machine))   return { ok: false, msg: 'Zutat leer – Getränk derzeit nicht verfügbar.' };
+
   if (machine.brewing.inProgress) return { ok: false, msg: 'Zubereitung läuft bereits…' };
 
   const brewMs =
-  (Number(drink?.config?.brewMS) > 0 && Number.isInteger(drink.config.brewMS)) ||
-  (Number(machine?.Brewing?.etaMS) > 0 && Number(machine.Brewing.etaMS)) ||
+  (Number(drink?.config?.brewMs) > 0 && Number(drink.config.brewMs)) ||
+  (Number(machine?.brewing?.etaMs) > 0 && Number(machine.brewing.etaMs)) ||
   DEFAULT_BREW_MS;
 
   machine.brewing = { inProgress: true, drinkId: drink.id, etaMs: brewMs, startedAt: Date.now(), awaitingCupRemoval: false };
 
   setTimeout(async () => {
     consumeIngredients(drink, machine);
-    // machine.payment.change = Number((machine.payment.inserted - drink.price).toFixed(2));
-    // machine.payment.inserted = 0;
-    // machine.brewing = { inProgress: false, drinkId: null, etaMs: brewMs, startedAt: 0, awaitingCupRemoval: true };
     const change = Number((machine.payment.inserted - drink.price).toFixed(2));
     machine.payment.inserted = Math.max(0, change);
     machine.payment.change = 0;
@@ -47,6 +57,7 @@ export async function postBrew(drink, machine) {
   }, brewMs);
   return { ok: true, msg: 'Zubereitung gestartet…', etaMs: brewMs };
 }
+
 
 export async function postFinish(machine) {
   machine.brewing.awaitingCupRemoval = false;

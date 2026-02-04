@@ -12,8 +12,11 @@ export function createApiRoutes(drinks, machine) {
 
   router.post('/api/brew', async (req, res) => {
     const drink = getDrinkById(drinks, req.body.id);
+    const bean = req.body.bean || null;
+
     if (!drink) return res.status(404).json({ ok: false, msg: 'Getränk nicht gefunden' });
-    res.json(await postBrew(drink, machine));
+
+    res.json(await postBrew(drink, machine, bean));
   });
 
   router.post('/api/finish', async (req, res) => {

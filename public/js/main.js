@@ -9,9 +9,14 @@
     screensaverTimeoutMs: 60000,
     appliedScreensaverTimeoutMs: null,
     autoBrewTriggered: false,
-    brewAnimTimer: null
+    brewAnimTimer: null,
+    beanTimerId: null,
+    beanTimerStarted: false,
+    beanAutoSeconds: 10,
+    beanConfirmed: false,   
+    awaitSince: null,
+    finishBtnBound: false
   };
-
 
   // ───────────────────────────────────────────────────────────────────────────
   // Screensaver nur auf Home
@@ -52,7 +57,6 @@
   async function tickHome() {
     const s = await getStatus();
 
-
     const newMs = Number(s.screensaverTimeoutMs);
     if (newMs !== state.screensaverTimeoutMs) {
       state.screensaverTimeoutMs = newMs;
@@ -76,7 +80,6 @@
     });
   }
 
-
   // ───────────────────────────────────────────────────────────────────────────
   // PAY – Auto-Start + grosses Bild bei fehlender Tasse
   // ───────────────────────────────────────────────────────────────────────────
@@ -84,13 +87,92 @@
     const ctx = window.__PAY_CONTEXT__;
     if (!ctx) return;
 
-    const s = await getStatus();
 
-    // UI
+ // UI-Helpers
+  function setBeanCardsSelection() {
+    const cards  = qsa('.bean-card');
+    const radios = qsa('input[name=bean]');
+    cards.forEach((card, idx) => {
+      const r = radios[idx];
+      card.onclick = () => {
+        radios.forEach(rr => rr.checked = false);
+        r.checked = true;
+        cards.forEach(c => c.classList.remove('checked'));
+        card.classList.add('checked');
+      };
+    });
+  }
+
+  function showBeanSection(show) {
+    const sec = qs('#bean-section');
+    if (!sec) return;
+    if (show) {
+      sec.classList.remove('hidden');
+      setBeanCardsSelection();
+    } else {
+      sec.classList.add('hidden');
+    }
+  }
+
+  async function tryStartIfReady(s, infoEl) {
     const inserted = Number(s.payment.inserted || 0);
     const price    = Number(ctx.price || 0);
     const remain   = Math.max(0, price - inserted);
-    const predictedChange = Math.max(0, inserted - price); // Prognose für Retourgeld *vor* Start
+    if (remain > 0) return;
+    if (!s.cupPresent) return;
+    if (state.autoBrewTriggered) return;
+    if (s.brewing.inProgress) return;
+    // Bei 2. Sorte: erst nach Bestätigung/Timeout
+    if (ctx.secondCoffee && ctx.recipeCoffee > 0 && !state.beanConfirmed) return;
+
+    state.autoBrewTriggered = true;
+    const res = await postJSON('/api/brew', { id: ctx.drinkId, bean: ctx.bean || null });
+    if (res.ok) {
+      if (state.beanTimerId) { clearInterval(state.beanTimerId); state.beanTimerId = null; }
+      state.beanTimerStarted = false;
+      window.location.href = `/brew/${ctx.drinkId}`;
+    } else {
+      infoEl.textContent = res.msg || 'Start fehlgeschlagen.';
+      state.autoBrewTriggered = false;
+    }
+  }
+
+  function doManualConfirm() {
+    const selected = document.querySelector("input[name=bean]:checked");
+    if (selected) ctx.bean = selected.value;
+    state.beanConfirmed = true;
+  }
+
+  function startBeanTimer() {
+    if (state.beanTimerStarted) return;
+    const timerEl  = qs('#auto-timer');
+    const btn      = qs('#manual-continue');
+    if (!timerEl) return; // Auswahl ist nicht sichtbar
+    state.beanTimerStarted = true;
+    state.beanAutoSeconds  = 10;
+    timerEl.textContent    = state.beanAutoSeconds;
+    if (btn) btn.addEventListener('click', () => { doManualConfirm(); }, { once: true });
+    state.beanTimerId = setInterval(() => {
+      state.beanAutoSeconds--;
+      if (timerEl) timerEl.textContent = state.beanAutoSeconds;
+      if (state.beanAutoSeconds <= 0) {
+        clearInterval(state.beanTimerId);
+        state.beanTimerId = null;
+        // Fallback: erste Bohne markieren
+        const first = document.querySelector('input[name=bean]');
+        if (first && !first.checked) first.checked = true;
+        doManualConfirm();
+      }
+    }, 1000);
+  }
+
+    const s = await getStatus();
+
+    // UI aktualisieren …
+    const inserted = Number(s.payment.inserted || 0);
+    const price    = Number(ctx.price || 0);
+    const remain   = Math.max(0, price - inserted);
+    const predictedChange = Math.max(0, inserted - price);
 
     qs('#pay-inserted').textContent = inserted.toFixed(2) + ' ' + s.currency;
     qs('#pay-remain').textContent   = remain.toFixed(2)   + ' ' + s.currency;
@@ -102,6 +184,10 @@
       info.textContent = `Bitte ${remain.toFixed(2)} ${s.currency} einwerfen.`;
       cupMissing.classList.add('hidden');
       state.autoBrewTriggered = false;
+      showBeanSection(false);
+      if (state.beanTimerId) { clearInterval(state.beanTimerId); state.beanTimerId = null; }
+      state.beanTimerStarted = false;
+      state.beanConfirmed    = false;
       return;
     }
 
@@ -109,25 +195,32 @@
       info.textContent = 'Bitte Tasse hinstellen – die Zubereitung startet automatisch.';
       cupMissing.classList.remove('hidden');
       state.autoBrewTriggered = false;
+      showBeanSection(false);
+      if (state.beanTimerId) { clearInterval(state.beanTimerId); state.beanTimerId = null; }
+      state.beanTimerStarted = false;
+      state.beanConfirmed    = false;
+
       return;
     }
 
-    // bezahlt & Tasse da -> Auto-Start
+    // bezahlt & Tasse da
     cupMissing.classList.add('hidden');
-    info.textContent = 'Bereit. Starte Zubereitung…';
-    if (!state.autoBrewTriggered && !s.brewing.inProgress) {
-      state.autoBrewTriggered = true;
-      const res = await postJSON('/api/brew', { id: ctx.drinkId });
-      if (res.ok) {
-        window.location.href = `/brew/${ctx.drinkId}`;
-      } else {
-        info.textContent = res.msg || 'Start fehlgeschlagen.';
-        state.autoBrewTriggered = false;
-      }
-    } else if (s.brewing.inProgress) {
+    info.textContent = 'Bereit. Du kannst gleich starten.';
+
+    // Soll die Auswahl erscheinen? (2. Sorte aktiv + Kaffeegetränk)
+    const shouldShowBeans = (ctx.secondCoffee && ctx.recipeCoffee > 0);
+    // Auswahl zeigen NUR wenn bezahlt & Tasse da
+    showBeanSection(shouldShowBeans);
+    if (shouldShowBeans) startBeanTimer();
+
+  
+    // Versuche nur zu starten, wenn Bedingungen inkl. Bohnenbestätigung erfüllt sind
+    await tryStartIfReady(s, info);
+
+    if (s.brewing.inProgress) {
       window.location.href = `/brew/${ctx.drinkId}`;
+      }
     }
-  }
 
   // ───────────────────────────────────────────────────────────────────────────
   // BREW – Fortschritt + Warten auf Tassenentnahme

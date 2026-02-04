@@ -38,4 +38,3 @@ export function createSuperuserRoutes(drinks, machine) {
 
   return router;
 }
-

@@ -2,9 +2,12 @@
 import { getLowStock, canMake } from '../services/drinksService.js';
 
 export function renderHome(drinks, machine) {
+  const modules = machine.modules || {};
+
   const enriched = drinks
     .filter(d => d.active)
-    .map(d => ({ ...d, available: canMake(d, machine) }));
+    .filter(d => modules.chocolate ? true : (d.recipe.chocolate === 0)) 
+    .map(d => ({ ...d, available: canMake(d, machine) }))
 
   return {
     template: 'index',
@@ -28,6 +31,7 @@ export function renderPay(drink, machine) {
     template: 'pay',
     data: {
       drink,
+      machine,
       status: { cupPresent: machine.cupPresent, payment: machine.payment, currency: machine.currency }
     }
   };

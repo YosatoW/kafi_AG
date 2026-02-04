@@ -1,9 +1,15 @@
-// src/controllers/adminController.js
+// src/controllers/superuserController.js
 import { saveDrinks } from '../repositories/drinksRepository.js';
 import { saveMachine } from '../repositories/machineRepository.js';
 
 export function renderAdmin(drinks, machine) {
-  return { template: 'superuser', data: { drinks, machine, currency: machine.currency } };
+  const modules = machine.modules || {};
+
+  const filtered = drinks.filter(d => {
+    if (!modules.chocolate && d.recipe.chocolate > 0) return false;
+    return true;
+  });
+  return { template: 'superuser', data: { drinks: filtered, machine, currency: machine.currency } };
 }
 
 export function renderSim(machine) {

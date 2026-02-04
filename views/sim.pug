@@ -12,16 +12,15 @@ block content
     .grid
       .card
         form(method="post" action="/superuser/sim")
-          h4 System & Sensoren
-
+          h3 System & Sensoren
           .row
             label Tasse erkannt
-            label
-              input(type="checkbox" name="cupPresent" checked=machine.cupPresent)
-              | Ja
+            .switch-wrapper
+              label.switch
+                input(type="checkbox" name="cupPresent" checked=machine.cupPresent)
+                span.slider
 
           h4 Zahlung
-
           .row
             label Betrag aufaddieren
             input(type="number" name="insertAdd" step="0.1" min="0")
@@ -32,24 +31,29 @@ block content
 
           .row
             label Payment zurücksetzen
-            label
-              input(type="checkbox" name="resetPayment")
-              | Ja
+            .switch-wrapper
+              label.switch
+                input(type="checkbox" name="resetPayment")
+                span.slider
 
           .row(style="justify-content: flex-end; grid-template-columns: auto;")
             button.btn(type="submit") Anwenden
 
       .card
         form(method="post" action="/superuser/sim")
-          h4 Zutaten
+          h3 Zutaten
 
           .row
             label Milch (g)
             input(type="number" name="milk" min="0" value=machine.ingredients.milk)
 
           .row
-            label Kaffee (g)
-            input(type="number" name="coffee" min="0" value=machine.ingredients.coffee)
+            label Kaffee 1 (g)
+            input(type="number" name="coffee1" min="0" value=machine.ingredients.coffee1)
+
+          .row
+            label Kaffee 2 (g)
+            input(type="number" name="coffee2" min="0" value=machine.ingredients.coffee2)
 
           .row
             label Schokolade (g)
@@ -62,3 +66,29 @@ block content
 
           .row(style="justify-content: flex-end; grid-template-columns: auto;")
             button.btn(type="submit") Anwenden
+
+    .grid
+      .card
+        h3 Zusätzliche Module
+
+        form(method="post" action="/superuser/sim")
+          // markiert dieses POST eindeutig als Modul-Form
+          input(type="hidden" name="modulesForm" value="1")
+
+          .row
+            label Kakao aktiv
+            .switch-wrapper
+              label.switch
+                input(type="checkbox" name="mod_chocolate" checked=machine.modules && machine.modules.chocolate)
+                span.slider
+
+          .row
+            label Zweite Kaffeesorte aktiv
+            .switch-wrapper
+              label.switch
+                input(type="checkbox" name="mod_secondCoffee" checked=machine.modules && machine.modules.secondCoffee)
+                span.slider
+
+          .row(style="justify-content:flex-end; grid-template-columns:auto")
+            button.btn(type="submit") Speichern
+
