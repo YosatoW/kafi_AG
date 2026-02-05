@@ -30,7 +30,7 @@ export async function setSimValues(machine, payload) {
   // Reset Ingredients
   if (resetIngredients) {
     machine.ingredients.milk      = machine.max.milk;
-    machine.ingredients.coffee    = machine.max.coffee;   // legacy
+    machine.ingredients.coffee    = machine.max.coffee;
     machine.ingredients.coffee1   = machine.max.coffee1;
     machine.ingredients.coffee2   = machine.max.coffee2;
     machine.ingredients.chocolate = machine.max.chocolate;
@@ -41,7 +41,7 @@ export async function setSimValues(machine, payload) {
 
   // Ingredient changes
   if (milk      !== undefined) machine.ingredients.milk      = toPos(milk);
-  if (coffee    !== undefined) machine.ingredients.coffee    = toPos(coffee);   // legacy, optional
+  if (coffee    !== undefined) machine.ingredients.coffee    = toPos(coffee);
   if (payload.coffee1 !== undefined) machine.ingredients.coffee1 = toPos(payload.coffee1);
   if (payload.coffee2 !== undefined) machine.ingredients.coffee2 = toPos(payload.coffee2);
   if (chocolate !== undefined) machine.ingredients.chocolate = toPos(chocolate);
@@ -68,7 +68,7 @@ export async function setSimValues(machine, payload) {
     if (insertAdd) machine.payment.inserted += toPos(insertAdd);
   }
 
-  // ─── MODULE SYSTEM (nur speichern wenn Modul-Formular gesendet wurde) ─────────
+// ─── MODULE SYSTEM (nur speichern wenn Modul-Formular gesendet wurde) ─────────
   if (!machine.modules) {
     machine.modules = {
       chocolate: true,
@@ -82,7 +82,7 @@ export async function setSimValues(machine, payload) {
 
   // Erkennen ob das Modulformular abgesendet wurde:
   const isModuleForm =
-    ("modulesForm" in payload) ||            // <── Sentinel
+    ("modulesForm" in payload) ||
     ("mod_chocolate" in payload) ||
     ("mod_secondCoffee" in payload) ||
     ("beans" in payload);
@@ -95,19 +95,46 @@ export async function setSimValues(machine, payload) {
     // Beans werden nur bei aktiver zweiter Sorte aktualisiert
     if (machine.modules.secondCoffee) {
       const beansForm = payload.beans || {};
-      const rawNames = beansForm.name || [];
-      const rawMods  = beansForm.priceMod || [];
+
+      // Namen können als Array oder einzelner String ankommen
+      const rawNames = Array.isArray(beansForm.name)
+        ? beansForm.name
+        : [beansForm.name].filter(Boolean);
+
+      // priceMod kommt im Formular aktuell NUR EINMAL (für Bohne 2)
+      let rawMods = beansForm.priceMod;
+      if (!Array.isArray(rawMods)) rawMods = [rawMods].filter(Boolean);
+
+      // Der Wert für Bohne 2 steht in deinem Formular an Index 0
+      const rawModForBean2 = rawMods[0];
+
+      // Komma zu Punkt konvertieren + sicher parsen
+      const toNumberSafe = (v, fallback = 0) => {
+        if (v === undefined || v === null || v === "") return fallback;
+        const num = Number(String(v).replace(',', '.'));
+        return Number.isFinite(num) ? num : fallback;
+      };
+
+      // Bisherige Werte als Fallback verwenden
+      const prev = machine.modules.beans || [
+        { id: "sorte1", name: "Sorte 1", priceMod: 0 },
+        { id: "sorte2", name: "Sorte 2", priceMod: 0 }
+      ];
+
+      // Leere Namen: nicht speichern → alten Namen beibehalten
+      const name1 = (rawNames[0] ?? '').trim();
+      const name2 = (rawNames[1] ?? '').trim();
 
       machine.modules.beans = [
         {
           id: "sorte1",
-          name: String(rawNames[0] || machine.modules.beans?.[0]?.name || "Sorte 1").trim(),
+          name: name1 !== '' ? name1 : (prev[0]?.name || "Sorte 1"),
           priceMod: 0
         },
         {
           id: "sorte2",
-          name: String(rawNames[1] || machine.modules.beans?.[1]?.name || "Sorte 2").trim(),
-          priceMod: Number(rawMods[1] ?? machine.modules.beans?.[1]?.priceMod ?? 0)
+          name: name2 !== '' ? name2 : (prev[1]?.name || "Sorte 2"),
+          priceMod: toNumberSafe(rawModForBean2, prev[1]?.priceMod ?? 0)
         }
       ];
     }

@@ -357,3 +357,28 @@ input[type="password"] {
 .bean-meta{ display:flex; flex-direction:column; }
 .bean-name{ font-weight:700; }
 .bean-extra{ font-size:.9rem; opacity:.85; }
+
+
+/* PAY GRID: 2 Spalten für Payment (links) und Bohnen-Auswahl (rechts) */
+.pay-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* Tassen-Hinweis unten */
+#cup-bottom {
+  margin-top: 20px;
+}
+
+/* Falls nicht vorhanden: Utility-Klasse zum Verstecken */
+.hidden {
+  display: none !important;
+}
+
+/* Mobile: unter 800px auf eine Spalte umbrechen */
+@media (max-width: 800px) {
+  .pay-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,11 +3,21 @@ import { getLowStock, canMake } from '../services/drinksService.js';
 
 export function renderHome(drinks, machine) {
   const modules = machine.modules || {};
+  const beans   = modules.beans || [];
+  
+  // max priceMod bestimmen
+  const maxPriceMod = modules.secondCoffee
+    ? Math.max(0, ...beans.map(b => Number(b.priceMod || 0)))
+    : 0;
 
   const enriched = drinks
     .filter(d => d.active)
-    .filter(d => modules.chocolate ? true : (d.recipe.chocolate === 0)) 
-    .map(d => ({ ...d, available: canMake(d, machine) }))
+    .filter(d => modules.chocolate ? true : (d.recipe.chocolate === 0))
+    .map(d => ({
+      ...d,
+      available: canMake(d, machine),
+      maxPriceMod: maxPriceMod   // << HIER NEU
+    }));
 
   return {
     template: 'index',
@@ -25,6 +35,7 @@ export function renderHome(drinks, machine) {
     }
   };
 }
+
 
 export function renderPay(drink, machine) {
   return {

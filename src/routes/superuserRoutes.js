@@ -31,6 +31,11 @@ export function createSuperuserRoutes(drinks, machine) {
     res.redirect('/superuser');
   });
 
+  router.post('/superuser/modules', async (req, res) => {
+    await setSimValues(machine, req.body);
+    res.redirect('/superuser');
+  });
+
   router.post('/superuser/sim', async (req, res) => {
     await setSimValues(machine, req.body);
     res.redirect('/sim');

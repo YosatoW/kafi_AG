@@ -12,13 +12,14 @@ block content
   - const beans = locals.beans;
 
   .app
+    // Dynamisches Grid: 2 Spalten wenn zweite Sorte aktiv, sonst 1 Spalte
     .grid(style=`display:grid; gap:20px; grid-template-columns:${secondCoffee && drink.recipe.coffee > 0 ? '1fr 1fr' : '1fr'}`)
 
+      // ───────────────────────────
       // LINKER BLOCK: PAYMENT
+      // ───────────────────────────
       .panel.card.fill
-        h2
-          | #{drink.name} – 
-          span#pay-title-price #{drink.price.toFixed(2)} #{status.currency}
+        h2= `${drink.name} – ${drink.price.toFixed(2)} ${status.currency}`
 
         .line
           label Guthaben:
@@ -40,21 +41,15 @@ block content
 
 
       if secondCoffee && drink.recipe.coffee > 0
-
         .card
           h3(style="margin-top:0") Kaffeesorte wählen
-          #bean-section.card(style="margin-top:16px;")
-            // Immer sichtbar:
-            p#bean-prompt(style="margin:0 0 8px 0; opacity:.85")
-              | Bitte Bohne wählen.
-
-            // Nur in speziellen Fällen sichtbar (per JS):
-            p#auto-hint.hidden(style="margin:0 0 12px 0; opacity:.85")
-              | Ohne Auswahl wird automatisch mit 
-              strong #{beans[0].name}
-              |  in 
-              span#auto-timer 10
-              |  Sekunden gestartet.
+          #bean-section.card.hidden(style="margin-top:16px;")
+          p#bean-hint(style="margin:0 0 12px 0; opacity:.85")
+            | Bitte Bohne wählen. Ohne Auswahl wird automatisch mit 
+            strong #{beans[0].name}
+            |  in 
+            span#auto-timer 10
+            |  Sekunden gestartet.
 
           .bean-grid
             each b, i in beans
@@ -66,19 +61,13 @@ block content
                   if b.priceMod && b.priceMod > 0
                     .bean-extra +#{b.priceMod.toFixed(2)} #{status.currency}
 
-            //- .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
-            //-   button.btn.primary#manual-continue Weiter
-          
-          .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
-            button.btn.primary#manual-continue.hidden Weiter
-
-
-
+            .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
+              button.btn.primary#manual-continue Weiter
 
     script.
       window.__PAY_CONTEXT__ = {
         drinkId: "!{drink.id}",
-        basePrice: !{drink.price},
+        price: !{drink.price},
         currency: "!{status.currency}",
         bean: "!{bean || ''}",
         secondCoffee: !{secondCoffee},
