@@ -2,7 +2,7 @@
   "cupPresent": false,
   "ingredients": {
     "milk": 5000,
-    "coffee1": 4360,
+    "coffee1": 4320,
     "coffee2": 5000,
     "chocolate": 5000
   },
@@ -19,10 +19,10 @@
     "coffee1": 500,
     "coffee2": 500
   },
-  "descaleIn": 484,
+  "descaleIn": 483,
   "descaleWarning": 50,
   "payment": {
-    "inserted": 3.5,
+    "inserted": 7.5,
     "change": 0
   },
   "brewing": {
@@ -35,8 +35,8 @@
   "screensaverTimeoutMs": 600000,
   "currency": "CHF",
   "modules": {
-    "chocolate": false,
-    "secondCoffee": true,
+    "chocolate": true,
+    "secondCoffee": false,
     "beans": [
       {
         "id": "sorte1",

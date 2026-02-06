@@ -38,7 +38,6 @@ block content
           .cup-icon 🥤
           h3 Bitte Tasse hinstellen
 
-
       if secondCoffee && drink.recipe.coffee > 0
 
         .card
@@ -53,7 +52,7 @@ block content
               | Ohne Auswahl wird automatisch mit 
               strong #{beans[0].name}
               |  in 
-              span#auto-timer 10
+              span#auto-timer 3
               |  Sekunden gestartet.
 
           .bean-grid
@@ -65,14 +64,9 @@ block content
                   .bean-name #{b.name}
                   if b.priceMod && b.priceMod > 0
                     .bean-extra +#{b.priceMod.toFixed(2)} #{status.currency}
-
-            //- .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
-            //-   button.btn.primary#manual-continue Weiter
           
           .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
             button.btn.primary#manual-continue.hidden Weiter
-
-
 
 
     script.
@@ -84,3 +78,4 @@ block content
         secondCoffee: !{secondCoffee},
         recipeCoffee: !{drink.recipe.coffee}
       };
+
