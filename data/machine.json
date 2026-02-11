@@ -1,7 +1,7 @@
 {
   "cupPresent": false,
   "ingredients": {
-    "milk": 5000,
+    "milk": 250,
     "coffee1": 5000,
     "coffee2": 5000,
     "chocolate": 5000
@@ -19,24 +19,24 @@
     "coffee1": 500,
     "coffee2": 500
   },
-  "descaleIn": 497,
+  "descaleIn": 500,
   "descaleWarning": 50,
   "payment": {
-    "inserted": 0,
+    "inserted": 97.5,
     "change": 0
   },
   "brewing": {
-    "inProgress": true,
-    "drinkId": "espresso",
+    "inProgress": false,
+    "drinkId": null,
     "etaMs": 10000,
-    "startedAt": 1770793046035,
+    "startedAt": 0,
     "awaitingCupRemoval": false
   },
   "screensaverTimeoutMs": 600000,
   "currency": "CHF",
   "modules": {
     "chocolate": true,
-    "secondCoffee": true,
+    "secondCoffee": false,
     "beans": [
       {
         "id": "sorte1",

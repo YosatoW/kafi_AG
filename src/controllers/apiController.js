@@ -20,27 +20,29 @@ export function getStatus(drinks, machine) {
 }
 
 export async function postBrew(drink, machine, beanId = null) {
-  const mods = machine.modules || {};
+  const mods  = machine.modules || {};
+  const beans = Array.isArray(machine.modules?.beans) ? machine.modules.beans : [];
 
+  // gewählte Bohne übernehmen (Fallback = erste Bean), nur bei Kaffee-Getränken & aktivem Modul
   if ((drink?.recipe?.coffee || 0) > 0 && mods.secondCoffee) {
-    drink.chosenBean = beanId || 'sorte1';
+    const fallbackBeanId = beans[0]?.id || null;
+    drink.chosenBean = beanId || fallbackBeanId;
   } else {
     drink.chosenBean = null;
   }
 
-  // Optionaler Server-Guard (empfohlen)
+  // Guards
   if (!canMake(drink, machine)) {
     return { ok: false, msg: 'Zutat leer – Getränk derzeit nicht verfügbar.' };
   }
 
-  // >>> Effektiven Preis inkl. Preisaufschlag ermitteln
-  const beans = Array.isArray(machine.modules?.beans) ? machine.modules.beans : [];
-  const chosenBean = beans.find(b => b.id === (drink.chosenBean || 'sorte1'));
-  const priceMod = Number(chosenBean?.priceMod || 0);
-  const basePrice = Number(drink.price || 0);
+  // Effektiver Preis
+  const chosenBean = beans.find(b => b.id === drink.chosenBean);
+  const priceMod   = Number(chosenBean?.priceMod || 0);
+  const basePrice  = Number(drink.price || 0);
   const effectivePrice = Number((basePrice + priceMod).toFixed(2));
 
-  // Guthaben/Restbetrag anhand des effektiven Preises prüfen
+  // Payment check
   const pay = moneyState(effectivePrice, machine);
   if (pay.remain > 0) return { ok: false, msg: `Bitte noch ${pay.remain.toFixed(2)} ${machine.currency} einwerfen.` };
   if (!machine.cupPresent)  return { ok: false, msg: 'Bitte Tasse hinstellen.' };
@@ -54,6 +56,7 @@ export async function postBrew(drink, machine, beanId = null) {
   machine.brewing = { inProgress: true, drinkId: drink.id, etaMs: brewMs, startedAt: Date.now(), awaitingCupRemoval: false };
 
   setTimeout(async () => {
+    // Zutaten abbuchen
     consumeIngredients(drink, machine);
 
     // Wechselgeld nach effektivem Preis
@@ -61,6 +64,7 @@ export async function postBrew(drink, machine, beanId = null) {
     machine.payment.inserted = Math.max(0, change);
     machine.payment.change = 0;
 
+    // auf Tassenentnahme warten
     machine.brewing = { inProgress: false, drinkId: null, etaMs: brewMs, startedAt: 0, awaitingCupRemoval: true };
 
     await saveMachine(machine);
@@ -68,7 +72,6 @@ export async function postBrew(drink, machine, beanId = null) {
 
   return { ok: true, msg: 'Zubereitung gestartet…', etaMs: brewMs };
 }
-
 
 export async function postFinish(machine) {
   machine.brewing.awaitingCupRemoval = false;

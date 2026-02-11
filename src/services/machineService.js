@@ -30,7 +30,6 @@ export async function setSimValues(machine, payload) {
   // Reset Ingredients
   if (resetIngredients) {
     machine.ingredients.milk      = machine.max.milk;
-    machine.ingredients.coffee    = machine.max.coffee;
     machine.ingredients.coffee1   = machine.max.coffee1;
     machine.ingredients.coffee2   = machine.max.coffee2;
     machine.ingredients.chocolate = machine.max.chocolate;

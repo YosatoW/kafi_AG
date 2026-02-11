@@ -1,7 +1,7 @@
 //- views/pay.pug
 extends layout
 
-block pageTitle 
+block pageTitle
   | Bezahlen
 
 block headerRight
@@ -12,9 +12,10 @@ block content
   - const beans = locals.beans;
 
   .app
+    // Dynamisches Grid: 2 Spalten wenn zweite Sorte aktiv, sonst 1 Spalte
     .grid(style=`display:grid; gap:20px; grid-template-columns:${secondCoffee && drink.recipe.coffee > 0 ? '1fr 1fr' : '1fr'}`)
 
-      // LINKER BLOCK: PAYMENT
+      // LINKS: PAYMENT
       .panel.card.fill
         h2
           | #{drink.name} – 
@@ -38,44 +39,28 @@ block content
           .cup-icon 🥤
           h3 Bitte Tasse hinstellen
 
+      // RECHTS: BOHNENWAHL (nur bei Kaffee & 2. Sorte aktiv)
       if secondCoffee && drink.recipe.coffee > 0
-
         .card
           h3(style="margin-top:0") Kaffeesorte wählen
           #bean-section.card(style="margin-top:16px;")
-            // Immer sichtbar:
-            p#bean-prompt(style="margin:0 0 8px 0; opacity:.85")
-              | Bitte Bohne wählen.
+            .bean-grid
+              each b, i in beans
+                label.bean-card(class=i===0 ? 'checked' : '')
+                  input(type="radio", name="bean", value=b.id, checked=(i===0))
+                  .bean-icon ☕
+                  .bean-meta
+                    .bean-name #{b.name}
+                    if b.priceMod && b.priceMod > 0
+                      .bean-extra +#{b.priceMod.toFixed(2)} #{status.currency}
 
-            // Nur in speziellen Fällen sichtbar (per JS):
-            p#auto-hint.hidden(style="margin:0 0 12px 0; opacity:.85")
-              | Ohne Auswahl wird automatisch mit 
-              strong #{beans[0].name}
-              |  in 
-              span#auto-timer 3
-              |  Sekunden gestartet.
-
-          .bean-grid
-            each b, i in beans
-              label.bean-card(class=i===0 ? 'checked' : '')
-                input(type="radio", name="bean", value=b.id, checked=(i===0))
-                .bean-icon ☕
-                .bean-meta
-                  .bean-name #{b.name}
-                  if b.priceMod && b.priceMod > 0
-                    .bean-extra +#{b.priceMod.toFixed(2)} #{status.currency}
-          
-          .row(style="justify-content:flex-end; grid-template-columns:auto; margin-top:8px;")
-            button.btn.primary#manual-continue.hidden Weiter
-
-
-    script.
-      window.__PAY_CONTEXT__ = {
-        drinkId: "!{drink.id}",
-        basePrice: !{drink.price},
-        currency: "!{status.currency}",
-        bean: "!{bean || ''}",
-        secondCoffee: !{secondCoffee},
-        recipeCoffee: !{drink.recipe.coffee}
-      };
-
+  script.
+    window.__PAY_CONTEXT__ = {
+      drinkId: "!{drink.id}",
+      name: "!{drink.name}",
+      basePrice: !{drink.price},
+      currency: "!{status.currency}",
+      bean: "!{bean || ''}",
+      secondCoffee: !{secondCoffee},
+      recipeCoffee: !{drink.recipe.coffee}
+    };

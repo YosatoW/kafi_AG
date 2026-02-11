@@ -36,7 +36,6 @@ export function renderHome(drinks, machine) {
   };
 }
 
-
 export function renderPay(drink, machine) {
   return {
     template: 'pay',

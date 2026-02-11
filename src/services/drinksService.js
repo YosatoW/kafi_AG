@@ -20,9 +20,7 @@ export function canMake(drink, machine) {
     if (k === 'coffee') {
       const c1 = Number(ing.coffee1 || 0);
       const c2 = Number(ing.coffee2 || 0);
-
-      // Wenn 2. Sorte aktiv → nimm den besseren Behälter,
-      // sonst nur coffee1
+      // wenn zweite Bohne aktiv → nimm den besseren Behälter, sonst coffee1
       have = mods.secondCoffee ? Math.max(c1, c2) : c1;
     } else {
       have = Number(ing[k] || 0);
@@ -33,11 +31,14 @@ export function canMake(drink, machine) {
   return true;
 }
 
-// Verbrauch: zieht bei "coffee" vom richtigen Behälter ab
+// Verbrauch: zieht bei "coffee" vom richtigen Behälter ab (indexbasiert)
 export function consumeIngredients(drink, machine) {
   const recipe = drink.recipe || {};
   const mods   = machine.modules || {};
   const ing    = machine.ingredients || {};
+
+  const beans  = Array.isArray(machine.modules?.beans) ? machine.modules.beans : [];
+  const firstId = beans[0]?.id || null;
 
   for (const [k, vRaw] of Object.entries(recipe)) {
     const v = Number(vRaw || 0);
@@ -46,7 +47,8 @@ export function consumeIngredients(drink, machine) {
     if (k === 'coffee') {
       const c1 = Number(ing.coffee1 || 0);
       const c2 = Number(ing.coffee2 || 0);
-      if (!mods.secondCoffee || !drink.chosenBean || drink.chosenBean === 'sorte1') {
+      // Ohne zweite Sorte oder wenn die gewählte Bohne die "erste" ist → coffee1
+      if (!mods.secondCoffee || !drink.chosenBean || (firstId && drink.chosenBean === firstId)) {
         ing.coffee1 = Math.max(0, c1 - v);
       } else {
         ing.coffee2 = Math.max(0, c2 - v);
@@ -58,7 +60,6 @@ export function consumeIngredients(drink, machine) {
 
   machine.descaleIn = Math.max(0, (machine.descaleIn || 0) - 1);
 }
-
 
 export function getLowStock(machine) {
   const out = [];
@@ -81,19 +82,16 @@ export function getLowStock(machine) {
   const c2 = Number(ing.coffee2 || 0);
 
   if (!mods.secondCoffee) {
-    // Nur 1 Sorte (coffee1)
     if (c1 < min) {
       out.push({ key: "coffee", name: "Kaffee" });
     }
   } else {
-    // 2 Sorten
     if (c1 < min) {
       out.push({
         key: "coffee1",
         name: `Kaffee ${machine.modules.beans[0].name}`
       });
     }
-
     if (c2 < min) {
       out.push({
         key: "coffee2",
@@ -101,10 +99,8 @@ export function getLowStock(machine) {
       });
     }
   }
-
   return out;
 }
-
 
 export function moneyState(price, machine) {
   const inserted = Number(machine.payment.inserted.toFixed(2));

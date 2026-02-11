@@ -4,7 +4,7 @@ extends layout
 block pageTitle
   | Willkommen bei Kafi AG
 
-block headerLeft 
+block headerLeft
   label Guthaben:
   span#pay-inserted= `${(status.payment.inserted||0).toFixed(2)} ${status.currency}`
 
@@ -34,14 +34,11 @@ block content
             data-id=d.id
           )
             .title #{d.name}
-            .price 
+            .price
               | #{d.price.toFixed(2)} #{status.currency}
               if d.maxPriceMod > 0 && d.recipe.coffee > 0
                 br
                 span(style="font-size:.85rem; opacity:.75")
-                  | + max. #{d.maxPriceMod.toFixed(2)} #{status.currency}
-
+                  | + #{d.maxPriceMod.toFixed(2)} #{status.currency}
             if !d.available
               .note Zutat leer
-
-              
