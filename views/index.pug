@@ -4,6 +4,10 @@ extends layout
 block pageTitle
   | Willkommen bei Kafi AG
 
+block headerLeft 
+  label Guthaben:
+  span#pay-inserted= `${(status.payment.inserted||0).toFixed(2)} ${status.currency}`
+
 block headerRight
   a.btn.small(href="/superuser") SuperUser
 
@@ -40,3 +44,4 @@ block content
             if !d.available
               .note Zutat leer
 
+              

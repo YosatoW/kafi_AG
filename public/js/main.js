@@ -66,6 +66,14 @@
       }
     }
 
+// Header: Guthaben laufend aktualisieren (wie bei Pay)
+    const headerInsertedEl = qs('#pay-inserted');
+    if (headerInsertedEl && s?.payment) {
+      const inserted = Number(s.payment.inserted || 0);
+      const currency = s.currency || '';
+      headerInsertedEl.textContent = `${inserted.toFixed(2)} ${currency}`;
+    }
+
     qsa('.drink').forEach(a => {
       const id = a.dataset.id;
       const d = s.drinks.find(x => x.id === id);
