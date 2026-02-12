@@ -2,7 +2,7 @@
   "cupPresent": false,
   "ingredients": {
     "milk": 5000,
-    "coffee1": 5000,
+    "coffee1": 499,
     "coffee2": 5000,
     "chocolate": 5000
   },
@@ -36,7 +36,7 @@
   "currency": "CHF",
   "modules": {
     "chocolate": false,
-    "secondCoffee": false,
+    "secondCoffee": true,
     "beans": [
       {
         "id": "sorte1",
@@ -46,7 +46,7 @@
       {
         "id": "sorte2",
         "name": "Robusta Intensiv",
-        "priceMod": 5
+        "priceMod": 10
       }
     ]
   }

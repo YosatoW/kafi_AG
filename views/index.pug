@@ -13,16 +13,6 @@ block headerRight
 
 block content
 
-  // WARNUNG UNTER DEM HEADER
-  if status.lowStock && status.lowStock.length
-    .alert-full
-      | Achtung: Mindestbestand unterschritten – 
-      = status.lowStock.map(item => item.name).join(", ")
-
-  else if status.descaleWarning
-    .alert-full
-      | Entkalkung fällig in #{status.descaleIn} Zubereitungen
-
   // KACHELN
   main.main.full
     .drinks
@@ -42,3 +32,4 @@ block content
                   | + #{d.maxPriceMod.toFixed(2)} #{status.currency}
             if !d.available
               .note Zutat leer
+

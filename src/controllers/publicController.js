@@ -16,7 +16,7 @@ export function renderHome(drinks, machine) {
     .map(d => ({
       ...d,
       available: canMake(d, machine),
-      maxPriceMod: maxPriceMod   // << HIER NEU
+      maxPriceMod: maxPriceMod
     }));
 
   return {
@@ -24,13 +24,13 @@ export function renderHome(drinks, machine) {
     data: {
       drinks: enriched,
       status: {
+        currency: machine.currency,
         cupPresent: machine.cupPresent,
-        descaleIn: machine.descaleIn,
         payment: machine.payment,
         screensaverTimeoutMs: machine.screensaverTimeoutMs,
-        currency: machine.currency,
         lowStock: getLowStock(machine),
-        descaleWarning: machine.descaleIn <= machine.descaleWarning
+        descaleWarning: machine.descaleIn <= machine.descaleWarning,
+        descaleIn: machine.descaleIn
       }
     }
   };
@@ -42,7 +42,14 @@ export function renderPay(drink, machine) {
     data: {
       drink,
       machine,
-      status: { cupPresent: machine.cupPresent, payment: machine.payment, currency: machine.currency }
+      status: {
+        currency: machine.currency,
+        cupPresent: machine.cupPresent,
+        payment: machine.payment,
+        lowStock: getLowStock(machine),
+        descaleWarning: machine.descaleIn <= machine.descaleWarning,
+        descaleIn: machine.descaleIn
+      }
     }
   };
 }
@@ -50,6 +57,15 @@ export function renderPay(drink, machine) {
 export function renderBrew(drink, machine) {
   return {
     template: 'brew',
-    data: { drink, status: { brewing: machine.brewing, currency: machine.currency } }
+    data: {
+      drink, status: {
+        currency: machine.currency,
+        brewing: machine.brewing,
+        lowStock: getLowStock(machine),
+        descaleWarning: machine.descaleIn <= machine.descaleWarning,
+        descaleIn: machine.descaleIn
+        }
+    }
   };
 }
+

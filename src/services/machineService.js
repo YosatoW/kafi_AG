@@ -9,7 +9,7 @@ export async function setSimValues(machine, payload) {
     milk, coffee, chocolate, cupPresent, descaleIn, timeoutMs,
     insertAdd, insertSet, resetPayment,
     minMilk, minCoffee, minChocolate,
-    resetIngredients, resetDescale
+    resetIngredients, resetDescale, currency
   } = payload;
 
   // ── Migration alter machine.json: coffee1/coffee2 ergänzen, falls fehlen
@@ -67,7 +67,12 @@ export async function setSimValues(machine, payload) {
     if (insertAdd) machine.payment.inserted += toPos(insertAdd);
   }
 
-// ─── MODULE SYSTEM (nur speichern wenn Modul-Formular gesendet wurde) ─────────
+  // Währung setzen
+  if (currency) {
+    machine.currency = String(currency).toUpperCase();
+  }
+
+  // ─── MODULE SYSTEM (nur speichern wenn Modul-Formular gesendet wurde) ─────────
   if (!machine.modules) {
     machine.modules = {
       chocolate: true,

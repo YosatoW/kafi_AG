@@ -1,6 +1,7 @@
 // src/controllers/superuserController.js
 import { saveDrinks } from '../repositories/drinksRepository.js';
 import { saveMachine } from '../repositories/machineRepository.js';
+import { getLowStock } from '../services/drinksService.js';
 
 export function renderAdmin(drinks, machine) {
   const modules = machine.modules || {};
@@ -9,11 +10,35 @@ export function renderAdmin(drinks, machine) {
     if (!modules.chocolate && d.recipe.chocolate > 0) return false;
     return true;
   });
-  return { template: 'superuser', data: { drinks: filtered, machine, currency: machine.currency } };
+
+  return {
+    template: 'superuser',
+    data: {
+      drinks: filtered,
+      machine,
+      currency: machine.currency,
+      status: {
+        lowStock: getLowStock(machine),
+        descaleWarning: machine.descaleIn <= machine.descaleWarning,
+        descaleIn: machine.descaleIn
+      }
+    }
+  };
 }
 
 export function renderSim(machine) {
-  return { template: 'sim', data: { machine, currency: machine.currency } };
+  return { 
+    template: 'sim',
+    data: {
+      machine,
+      currency: machine.currency,
+      status: {
+        lowStock: getLowStock(machine),
+        descaleWarning: machine.descaleIn <= machine.descaleWarning,
+        descaleIn: machine.descaleIn
+      }
+    }
+  };
 }
 
 export async function postSettings(machine, payload, applySettingsFn) {
@@ -67,3 +92,4 @@ export async function postDrinks(drinks, payload) {
   }
   await saveDrinks(drinks);
 }
+

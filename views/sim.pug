@@ -89,6 +89,14 @@ block content
                 input(type="checkbox" name="mod_secondCoffee" checked=machine.modules && machine.modules.secondCoffee)
                 span.slider
 
+          .row
+            label Währung
+            select(name="currency")
+              option(value="CHF" selected=(currency==="CHF")) CHF
+              option(value="EUR" selected=(currency==="EUR")) EUR
+              option(value="USD" selected=(currency==="USD")) USD
+
+
           .row(style="justify-content:flex-end; grid-template-columns:auto")
             button.btn(type="submit") Speichern
 

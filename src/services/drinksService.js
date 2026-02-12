@@ -1,5 +1,4 @@
 // src/services/drinksService.js
-
 export function getDrinkById(drinks, id) {
   return drinks.find(d => d.id === id);
 }

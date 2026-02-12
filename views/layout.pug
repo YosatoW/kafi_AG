@@ -24,16 +24,16 @@ html
         .header-right
           block headerRight
 
-      block content
-        // WARNUNG UNTER DEM HEADER
-        if status.lowStock && status.lowStock.length
-          .alert-full
-            | Achtung: Mindestbestand unterschritten – 
-            = status.lowStock.map(item => item.name).join(", ")
+      // WARNUNG UNTER DEM HEADER (ZENTRAL, ÜBERALL)  // CHANGED
+      if status && status.lowStock && status.lowStock.length
+        .alert-full
+          | Achtung: Mindestbestand unterschritten – 
+          = status.lowStock.map(item => item.name).join(", ")
+      else if status && status.descaleWarning
+        .alert-full
+          | Entkalkung fällig in #{status.descaleIn} Zubereitungen
 
-        else if status.descaleWarning
-          .alert-full
-            | Entkalkung fällig in #{status.descaleIn} Zubereitungen
+      block content
 
     script(src="/js/ui-constants.js")
     script(src="/js/main.js")
