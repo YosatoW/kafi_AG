@@ -3,6 +3,18 @@
   const qs  = (sel) => document.querySelector(sel);
   const qsa = (sel) => Array.from(document.querySelectorAll(sel));
 
+  // ── Zentrale Textbausteine ────────────────────────────────────────────────
+  const TEXT = {
+    cupMissing: "Bitte Tasse hinstellen.",
+    insertMore: (amount, currency) => `Bitte noch ${amount.toFixed(2)} ${currency} einwerfen.`,
+    insertMoreAndCup: (amount, currency) => `Bitte noch ${amount.toFixed(2)} ${currency} einwerfen und Tasse hinstellen.`,
+    willStartIn: (drink, secs) => `${drink} wird automatisch in ${secs}s zubereitet…`,
+    brewing: "Zubereitung läuft…",
+    finished: "Fertig! Bitte Getränk entnehmen.",
+    done: "Fertig."
+  };
+
+  // ── State ─────────────────────────────────────────────────────────────────
   const state = {
     screensaverTimer: null,
     screensaverTimeoutMs: 60000,
@@ -13,15 +25,16 @@
     // Brew UI
     brewAnimTimer: null,
 
-    // Countdown-Logik (10s beim ready entry / 3s beim späteren ready)
+    // Countdown (10s beim ready entry / 3s beim späteren ready)
     startBrewTimerId: null,
     startBrewSecs: 0,
 
-    // Merkt sich, ob die Pay-Seite beim Einstieg schon „bereit“ war (Cup + Basis gedeckt)
-    wasReadyOnEntry: false
+    // Merker: Pay war beim Einstieg schon „bereit“ (Cup + Basis gedeckt)
+    wasReadyOnEntry: false,
+    beanEventsBound: false
   };
 
-  // ───────────────────────────────────────────────────────────────────────────
+
   // Screensaver (nur Home)
   // ───────────────────────────────────────────────────────────────────────────
   function resetInactivityTimer() {
@@ -41,7 +54,6 @@
     resetInactivityTimer();
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
   // API
   // ───────────────────────────────────────────────────────────────────────────
   async function getStatus() {
@@ -54,7 +66,6 @@
     return r.json();
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
   // HOME
   // ───────────────────────────────────────────────────────────────────────────
   async function tickHome() {
@@ -92,11 +103,8 @@
     });
   }
 
+  // PAY – Bohnenwahl & Auto-Start (10s/3s Countdown)
   // ───────────────────────────────────────────────────────────────────────────
-  // PAY – Bohnenwahl & Auto-Start (10s beim ready entry, 3s wenn später ready)
-  // ───────────────────────────────────────────────────────────────────────────
-
-  // Sichtbarkeit der Bohnen-Section
   function showBeanSection(show) {
     const sec = qs('#bean-section');
     if (!sec) return;
@@ -135,20 +143,19 @@
     state.startBrewSecs = 0;
   }
 
-  function startBrewCountdown(secs, ctx, status, effectivePrice) {
+  function startBrewCountdown(secs, ctx, status) {
     cancelBrewCountdown();
     state.startBrewSecs = secs;
 
     const info = document.querySelector('#pay-info');
     const cupIcon = document.querySelector('#cup-missing');
-    const currency = status.currency || 'CHF';
     const drinkName =
       (typeof ctx.name === 'string' && ctx.name) ||
       (document.querySelector('h2')?.textContent?.split('–')[0]?.trim()) ||
       'Getränk';
 
     if (cupIcon) cupIcon.classList.add('hidden');
-    if (info) info.textContent = `${drinkName} wird automatisch in ${state.startBrewSecs}s zubereitet…`;
+    if (info) info.textContent = TEXT.willStartIn(drinkName, state.startBrewSecs);
 
     state.startBrewTimerId = setInterval(async () => {
       state.startBrewSecs--;
@@ -162,7 +169,7 @@
         const infoNow = document.querySelector('#pay-info');
         const cupIconNow = document.querySelector('#cup-missing');
         if (cupIconNow) cupIconNow.classList.remove('hidden');
-        if (infoNow) infoNow.textContent = 'Bitte Tasse hinstellen.';
+        if (infoNow) infoNow.textContent = TEXT.cupMissing;
         state.autoBrewTriggered = false;
         return;
       }
@@ -170,13 +177,13 @@
       if (ps.remainEff > 0) {
         cancelBrewCountdown();
         const infoNow = document.querySelector('#pay-info');
-        if (infoNow) infoNow.textContent = `Bitte noch ${ps.remainEff.toFixed(2)} ${currency} einwerfen.`;
+        if (infoNow) infoNow.textContent = TEXT.insertMore(ps.remainEff, s.currency || 'CHF');
         state.autoBrewTriggered = false;
         return;
       }
 
       const infoTick = document.querySelector('#pay-info');
-      if (infoTick) infoTick.textContent = `${drinkName} wird automatisch in ${state.startBrewSecs}s zubereitet…`;
+      if (infoTick) infoTick.textContent = TEXT.willStartIn(drinkName, state.startBrewSecs);
 
       if (state.startBrewSecs <= 0) {
         cancelBrewCountdown();
@@ -238,29 +245,29 @@
 
       if (!s.cupPresent) {
         if (cupIcon) cupIcon.classList.remove('hidden');
-        if (info) info.textContent = 'Bitte Tasse hinstellen.';
+        if (info) info.textContent = TEXT.cupMissing;
         if (hadCountdown) cancelBrewCountdown();
         return;
       }
       if (ps.remainBase > 0) {
         if (cupIcon) cupIcon.classList.add('hidden');
-        if (info) info.textContent = `Bitte noch ${ps.remainBase.toFixed(2)} ${currency} einwerfen.`;
+        if (info) info.textContent = TEXT.insertMore(ps.remainBase, currency);
         if (hadCountdown) cancelBrewCountdown();
         return;
       }
       if (ps.remainEff === 0) {
         if (hadCountdown) {
           // Countdown läuft → Restlaufzeit behalten
-          if (info) info.textContent = `${drinkName} wird automatisch in ${remainingBefore}s zubereitet…`;
+          if (info) info.textContent = TEXT.willStartIn(drinkName, remainingBefore);
           return;
         } else {
           const secs = state.wasReadyOnEntry ? 10 : 3;
-          startBrewCountdown(secs, ctx, s, ps.effective);
+          startBrewCountdown(secs, ctx, s);
           return;
         }
       } else {
         // Effektiver Preis nicht gedeckt → Countdown abbrechen, Hinweis zeigen
-        if (info) info.textContent = `Bitte noch ${ps.remainEff.toFixed(2)} ${currency} einwerfen.`;
+        if (info) info.textContent = TEXT.insertMore(ps.remainEff, currency);
         if (hadCountdown) cancelBrewCountdown();
         return;
       }
@@ -291,25 +298,45 @@
     }
 
     // Bohnenkarten-Klicks binden (idempotent)
+    // const shouldShowBeans = (ctx.secondCoffee && ctx.recipeCoffee > 0);
+    // showBeanSection(shouldShowBeans);
+    // if (shouldShowBeans) setBeanCardsSelection(ctx);
     const shouldShowBeans = (ctx.secondCoffee && ctx.recipeCoffee > 0);
     showBeanSection(shouldShowBeans);
-    if (shouldShowBeans) setBeanCardsSelection(ctx);
+    if (shouldShowBeans && !state.beanEventsBound) {
+      setBeanCardsSelection(ctx);
+      state.beanEventsBound = true;
+    }
+    if (!shouldShowBeans && state.beanEventsBound) {
+      state.beanEventsBound = false;
+    }
+
 
     // Payment-State
     const ps = computePayState(s, ctx);
 
     // UI Geld/Preis
-    qs('#pay-inserted')?.replaceChildren(document.createTextNode(`${ps.inserted.toFixed(2)} ${s.currency}`));
-    qs('#pay-remain')  ?.replaceChildren(document.createTextNode(`${ps.remainEff.toFixed(2)} ${s.currency}`));
-    qs('#pay-change')  ?.replaceChildren(document.createTextNode(`${Math.max(0, ps.inserted - ps.effective).toFixed(2)} ${s.currency}`));
-    qs('#pay-title-price')?.replaceChildren(document.createTextNode(`${ps.effective.toFixed(2)} ${s.currency}`));
+    // qs('#pay-inserted')?.replaceChildren(document.createTextNode(`${ps.inserted.toFixed(2)} ${s.currency}`));
+    // qs('#pay-remain')  ?.replaceChildren(document.createTextNode(`${ps.remainEff.toFixed(2)} ${s.currency}`));
+    // qs('#pay-change')  ?.replaceChildren(document.createTextNode(`${Math.max(0, ps.inserted - ps.effective).toFixed(2)} ${s.currency}`));
+    // qs('#pay-title-price')?.replaceChildren(document.createTextNode(`${ps.effective.toFixed(2)} ${s.currency}`));
+
+    const elInserted = qs('#pay-inserted');
+    const elRemain   = qs('#pay-remain');
+    const elChange   = qs('#pay-change');
+    const elTitle    = qs('#pay-title-price');
+    if (elInserted) elInserted.textContent = `${ps.inserted.toFixed(2)} ${s.currency}`;
+    if (elRemain)   elRemain.textContent   = `${ps.remainEff.toFixed(2)} ${s.currency}`;
+    if (elChange)   elChange.textContent   = `${Math.max(0, ps.inserted - ps.effective).toFixed(2)} ${s.currency}`;
+    if (elTitle)    elTitle.textContent    = `${ps.effective.toFixed(2)} ${s.currency}`;
+
 
     const info    = qs('#pay-info');
     const cupIcon = qs('#cup-missing');
 
     // 4 klare Fälle
     if (ps.remainBase > 0 && !s.cupPresent) {
-      if (info) info.textContent = `Bitte noch ${ps.remainBase.toFixed(2)} ${s.currency} einwerfen und Tasse hinstellen.`;
+      info.textContent = TEXT.insertMoreAndCup(ps.remainBase, s.currency);
       cupIcon?.classList.remove('hidden');
       cancelBrewCountdown();
       state.autoBrewTriggered = false;
@@ -317,7 +344,7 @@
     }
 
     if (ps.remainBase > 0 && s.cupPresent) {
-      if (info) info.textContent = `Bitte noch ${ps.remainBase.toFixed(2)} ${s.currency} einwerfen.`;
+      info.textContent = TEXT.insertMore(ps.remainBase, s.currency);
       cupIcon?.classList.add('hidden');
       cancelBrewCountdown();
       state.autoBrewTriggered = false;
@@ -325,7 +352,7 @@
     }
 
     if (ps.remainBase === 0 && !s.cupPresent) {
-      if (info) info.textContent = `Bitte Tasse hinstellen.`;
+      info.textContent = TEXT.cupMissing;
       cupIcon?.classList.remove('hidden');
       cancelBrewCountdown();
       state.autoBrewTriggered = false;
@@ -336,7 +363,7 @@
     cupIcon?.classList.add('hidden');
 
     if (ps.remainEff > 0) {
-      if (info) info.textContent = `Bitte noch ${ps.remainEff.toFixed(2)} ${s.currency} einwerfen.`;
+      info.textContent = TEXT.insertMore(ps.remainEff, s.currency);
       cancelBrewCountdown();
       state.autoBrewTriggered = false;
       return;
@@ -345,12 +372,11 @@
     // Effektiv gedeckt + Cup da → Countdown (10s beim Entry-ready, sonst 3s)
     const secs = state.wasReadyOnEntry ? 10 : 3;
     if (!state.startBrewTimerId && !state.autoBrewTriggered) {
-      startBrewCountdown(secs, ctx, s, ps.effective);
+      startBrewCountdown(secs, ctx, s);
       state.autoBrewTriggered = true;
     }
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
   // BREW – Fortschritt + Warten auf Tassenentnahme
   // ───────────────────────────────────────────────────────────────────────────
   function animateBar(durationMs) {
@@ -379,7 +405,7 @@
     if (s.brewing.inProgress) {
       if (!state.brewAnimTimer) {
         animateBar(s.brewing.etaMs);
-        if (msg) msg.textContent = 'Zubereitung läuft…';
+        if (msg) msg.textContent = TEXT.brewing;
         removeBlock?.classList.add('hidden');
       }
       return;
@@ -393,7 +419,7 @@
     if (s.brewing.awaitingCupRemoval) {
       // Warten auf Tassenentnahme
       removeBlock?.classList.remove('hidden');
-      if (msg) msg.textContent = 'Fertig! Bitte Getränk entnehmen.';
+      if (msg) msg.textContent = TEXT.finished;
       if (!s.cupPresent) {
         // Tasse wurde entfernt -> Abschluss
         await postJSON('/api/finish', {});
@@ -401,12 +427,11 @@
       }
     } else {
       // Fallback
-      if (msg) msg.textContent = 'Fertig.';
+      if (msg) msg.textContent = TEXT.done;
       setTimeout(() => { window.location.href = '/'; }, 1200);
     }
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
   // Init
   // ───────────────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', async () => {

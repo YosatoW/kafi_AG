@@ -10,8 +10,23 @@
       "chocolate": 0
     },
     "config": {
-      "mahlgrad": 3,
+      "mahlgrad": 8,
       "water": 40
+    }
+  },
+  {
+    "id": "ristretto",
+    "name": "Ristretto",
+    "price": 2.5,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 0,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 9,
+      "water": 25
     }
   },
   {
@@ -30,18 +45,33 @@
     }
   },
   {
-    "id": "cafeblack",
-    "name": "Café Schwarz",
+    "id": "lungo",
+    "name": "Lungo",
     "price": 3.2,
     "active": true,
     "recipe": {
       "coffee": 50,
-      "milk": 5,
+      "milk": 0,
       "chocolate": 0
     },
     "config": {
-      "mahlgrad": 3,
-      "water": 180
+      "mahlgrad": 4,
+      "water": 120
+    }
+  },
+  {
+    "id": "americano",
+    "name": "Americano",
+    "price": 3.2,
+    "active": true,
+    "recipe": {
+      "coffee": 40,
+      "milk": 0,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 6,
+      "water": 200
     }
   },
   {
@@ -60,18 +90,48 @@
     }
   },
   {
-    "id": "flatwhite",
-    "name": "Flat White",
-    "price": 4,
+    "id": "cafeblack",
+    "name": "Café Schwarz",
+    "price": 3.2,
     "active": true,
     "recipe": {
-      "coffee": 40,
-      "milk": 120,
+      "coffee": 50,
+      "milk": 5,
       "chocolate": 0
     },
     "config": {
-      "mahlgrad": 2,
-      "water": 200
+      "mahlgrad": 3,
+      "water": 180
+    }
+  },
+  {
+    "id": "espressomacchiato",
+    "name": "Espresso Macchiato",
+    "price": 3,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 20,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 6,
+      "water": 40
+    }
+  },
+  {
+    "id": "cortado",
+    "name": "Cortado",
+    "price": 3.4,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 60,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 3,
+      "water": 120
     }
   },
   {
@@ -105,6 +165,21 @@
     }
   },
   {
+    "id": "caffelatte",
+    "name": "Caffè Latte",
+    "price": 4,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 170,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 240
+    }
+  },
+  {
     "id": "milchkaffee",
     "name": "Milchkaffee",
     "price": 3.5,
@@ -117,6 +192,21 @@
     "config": {
       "mahlgrad": 2,
       "water": 240
+    }
+  },
+  {
+    "id": "flatwhite",
+    "name": "Flat White",
+    "price": 4,
+    "active": true,
+    "recipe": {
+      "coffee": 40,
+      "milk": 120,
+      "chocolate": 0
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 200
     }
   },
   {
@@ -135,6 +225,21 @@
     }
   },
   {
+    "id": "mocha",
+    "name": "Caffè Mocha",
+    "price": 4.2,
+    "active": true,
+    "recipe": {
+      "coffee": 30,
+      "milk": 120,
+      "chocolate": 50
+    },
+    "config": {
+      "mahlgrad": 2,
+      "water": 240
+    }
+  },
+  {
     "id": "kakaomilch",
     "name": "Kakao mit Milch",
     "price": 3.2,
@@ -146,6 +251,62 @@
     },
     "config": {
       "water": 220
+    }
+  },
+  {
+    "id": "hotchocolate_dark",
+    "name": "Heisse Schokolade (dunkel)",
+    "price": 3.6,
+    "active": true,
+    "recipe": {
+      "coffee": 0,
+      "milk": 160,
+      "chocolate": 100
+    },
+    "config": {
+      "water": 200
+    }
+  },
+  {
+    "id": "chai_latte",
+    "name": "Chai Latte",
+    "price": 4,
+    "active": true,
+    "recipe": {
+      "coffee": 0,
+      "milk": 180,
+      "chocolate": 0
+    },
+    "config": {
+      "water": 220
+    }
+  },
+  {
+    "id": "babyccino",
+    "name": "Babyccino",
+    "price": 2,
+    "active": true,
+    "recipe": {
+      "coffee": 0,
+      "milk": 160,
+      "chocolate": 0
+    },
+    "config": {
+      "water": 40
+    }
+  },
+  {
+    "id": "hotmilk",
+    "name": "Heisse Milch",
+    "price": 2.2,
+    "active": true,
+    "recipe": {
+      "coffee": 0,
+      "milk": 200,
+      "chocolate": 0
+    },
+    "config": {
+      "water": 40
     }
   },
   {

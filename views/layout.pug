@@ -25,6 +25,16 @@ html
           block headerRight
 
       block content
+        // WARNUNG UNTER DEM HEADER
+        if status.lowStock && status.lowStock.length
+          .alert-full
+            | Achtung: Mindestbestand unterschritten – 
+            = status.lowStock.map(item => item.name).join(", ")
 
+        else if status.descaleWarning
+          .alert-full
+            | Entkalkung fällig in #{status.descaleIn} Zubereitungen
+
+    script(src="/js/ui-constants.js")
     script(src="/js/main.js")
 
