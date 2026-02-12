@@ -53,6 +53,7 @@ block content
                     .bean-name #{b.name}
                     if b.priceMod && b.priceMod > 0
                       .bean-extra +#{b.priceMod.toFixed(2)} #{status.currency}
+                    .bean-warning.hidden Zu wenig Bestand
 
   script.
     window.__PAY_CONTEXT__ = {

@@ -358,6 +358,21 @@ input[type="password"] {
 .bean-name{ font-weight:700; }
 .bean-extra{ font-size:.9rem; opacity:.85; }
 
+/* >>> ADDED: Bean disabled + Hinweistext (Pay) >>> */
+.bean-card.disabled {
+  opacity: 0.45;
+  filter: grayscale(80%);
+  cursor: not-allowed;
+}
+
+.bean-warning {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+/* <<< END ADDED */
+
 
 /* PAY GRID: 2 Spalten für Payment (links) und Bohnen-Auswahl (rechts) */
 .pay-grid {

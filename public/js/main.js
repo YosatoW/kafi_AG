@@ -209,6 +209,73 @@
     }, 1000);
   }
 
+  // ADDED: Bohnen-Bestand prüfen + UI disabled + Auto-Fallback (Kaffee1->Kaffee2)
+  function beanIdxById(status, beanId) {
+    const beans = status.modules?.beans || [];
+    return beans.findIndex(b => b.id === beanId);
+  }
+
+  function beanHasEnough(status, beanId, ctx) {
+    const need = Number(ctx.recipeCoffee || 0);
+    if (need <= 0) return true;
+
+    const idx = beanIdxById(status, beanId);
+    if (idx < 0) return false;
+
+    const ing = status.ingredients || {};
+    const have = (idx === 0) ? Number(ing.coffee1 || 0) : Number(ing.coffee2 || 0);
+    return have >= need;
+  }
+
+  function setSelectedBeanUI(beanId) {
+    const radio = qs(`input[name=bean][value="${beanId}"]`);
+    if (!radio) return;
+
+    radio.checked = true;
+    qsa('.bean-card').forEach(c => c.classList.remove('checked'));
+    radio.closest('.bean-card')?.classList.add('checked');
+  }
+
+  function updateBeanUIAndAutoSelect(status, ctx) {
+    const beans = status.modules?.beans || [];
+    if (!beans.length) return;
+
+    const availability = beans.map(b => ({
+      id: b.id,
+      ok: beanHasEnough(status, b.id, ctx)
+    }));
+
+    // UI: disable + Hinweis toggeln
+    availability.forEach(a => {
+      const radio = qs(`input[name=bean][value="${a.id}"]`);
+      const card  = radio?.closest('.bean-card');
+      if (!radio || !card) return;
+
+      radio.disabled = !a.ok;
+      card.classList.toggle('disabled', !a.ok);
+
+      const warn = card.querySelector('.bean-warning');
+      if (warn) warn.classList.toggle('hidden', a.ok);
+    });
+
+    // Auto-Select: wenn aktuelle Auswahl nicht ok -> erste ok Bohne wählen
+    const current = ctx.bean || qs('input[name=bean]:checked')?.value || beans[0]?.id || null;
+    const currentOk = current ? beanHasEnough(status, current, ctx) : false;
+
+    if (!currentOk) {
+      const firstOk = availability.find(x => x.ok)?.id || null;
+      if (firstOk) {
+        ctx.bean = firstOk;
+        setSelectedBeanUI(firstOk);
+        return;
+      }
+      // Keine Bohne ok:
+      ctx.bean = null;
+    } else {
+      ctx.bean = current;
+    }
+  }
+
   // Bohnenkarten anklickbar: sofortige, verbindliche Auswahl + Countdown neu bewerten (ohne Reset)
   function setBeanCardsSelection(ctx) {
     const cards  = qsa('.bean-card');
@@ -222,6 +289,7 @@
 
     async function confirm(radioEl) {
       if (!radioEl) return;
+      if (radioEl.disabled) return;
       radios.forEach(rr => rr.checked = false);
       radioEl.checked = true;
       applyCheckedClasses();
@@ -232,8 +300,12 @@
       // Countdown NICHT resetten, wenn weiterhin alle Bedingungen erfüllt sind
       const hadCountdown = !!state.startBrewTimerId;
       const remainingBefore = state.startBrewSecs;
-
       const s = await getStatus();
+      if (ctx.secondCoffee && ctx.recipeCoffee > 0) {
+        updateBeanUIAndAutoSelect(s, ctx);
+        // wenn durch AutoSelect gewechselt wurde und aktuelle Karte disabled war -> abbrechen
+        if (ctx.bean !== radioEl.value) return;
+      }
       const ps = computePayState(s, ctx);
       const info = document.querySelector('#pay-info');
       const cupIcon = document.querySelector('#cup-missing');
@@ -298,9 +370,6 @@
     }
 
     // Bohnenkarten-Klicks binden (idempotent)
-    // const shouldShowBeans = (ctx.secondCoffee && ctx.recipeCoffee > 0);
-    // showBeanSection(shouldShowBeans);
-    // if (shouldShowBeans) setBeanCardsSelection(ctx);
     const shouldShowBeans = (ctx.secondCoffee && ctx.recipeCoffee > 0);
     showBeanSection(shouldShowBeans);
     if (shouldShowBeans && !state.beanEventsBound) {
@@ -311,16 +380,23 @@
       state.beanEventsBound = false;
     }
 
+    if (shouldShowBeans) {
+      updateBeanUIAndAutoSelect(s, ctx);
+
+      // wenn keine Bohne verfügbar -> Hinweis und Ende (kein Countdown)
+      if (!ctx.bean) {
+        const infoNoBean = qs('#pay-info');
+        if (infoNoBean) infoNoBean.textContent = 'Keine Kaffeesorte mit ausreichendem Bestand verfügbar.';
+        cancelBrewCountdown();
+        state.autoBrewTriggered = false;
+        return;
+      }
+    }
 
     // Payment-State
     const ps = computePayState(s, ctx);
 
     // UI Geld/Preis
-    // qs('#pay-inserted')?.replaceChildren(document.createTextNode(`${ps.inserted.toFixed(2)} ${s.currency}`));
-    // qs('#pay-remain')  ?.replaceChildren(document.createTextNode(`${ps.remainEff.toFixed(2)} ${s.currency}`));
-    // qs('#pay-change')  ?.replaceChildren(document.createTextNode(`${Math.max(0, ps.inserted - ps.effective).toFixed(2)} ${s.currency}`));
-    // qs('#pay-title-price')?.replaceChildren(document.createTextNode(`${ps.effective.toFixed(2)} ${s.currency}`));
-
     const elInserted = qs('#pay-inserted');
     const elRemain   = qs('#pay-remain');
     const elChange   = qs('#pay-change');
@@ -329,7 +405,6 @@
     if (elRemain)   elRemain.textContent   = `${ps.remainEff.toFixed(2)} ${s.currency}`;
     if (elChange)   elChange.textContent   = `${Math.max(0, ps.inserted - ps.effective).toFixed(2)} ${s.currency}`;
     if (elTitle)    elTitle.textContent    = `${ps.effective.toFixed(2)} ${s.currency}`;
-
 
     const info    = qs('#pay-info');
     const cupIcon = qs('#cup-missing');
