@@ -45,7 +45,7 @@ stateDiagram-v2
     %% --- Geld prüfen
     Z5 --> Z4: Betrag < Preis
     Z5 --> Z6: Betrag > Preis
-    Z5 --> [*]: Betrag == Preis
+    Z5 --> [*]: Betrag = Preis
 
     %% --- Rückgeld ausgeben
     %% (gilt sowohl bei "Abbruch mit Geld" als auch bei "Betrag > Preis")

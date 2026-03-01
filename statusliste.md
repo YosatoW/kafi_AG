@@ -6,7 +6,6 @@
 <!-- /ToC -->
 -----
 # 1. KAFI AG | FEHLER- UND STATUSLISTE
-
 ## 1.1. HARDWARE-FEHLER
 
 CODE   | BESCHREIBUNG                        | SYMPTOME                                 | SUPERUSER           | TECHNIKER
