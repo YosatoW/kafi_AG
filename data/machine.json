@@ -22,11 +22,7 @@
   "descaleIn": 489,
   "descaleWarning": 50,
   "payment": {
-<<<<<<< HEAD
     "inserted": 5,
-=======
-    "inserted": 2.5,
->>>>>>> 8145d535964bb8255c2cd729441762fef78d92df
     "change": 0
   },
   "brewing": {
