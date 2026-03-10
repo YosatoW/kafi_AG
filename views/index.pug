@@ -9,6 +9,13 @@ block headerLeft
   span#pay-inserted= `${(status.payment.inserted||0).toFixed(2)} ${status.currency}`
 
 block headerRight
+  if status.lowStock && status.lowStock.length || status.descaleWarning
+    button.btn.small.warn-icon(
+      type="button"
+      onclick="openWarningModal()"
+      title="Warnungen anzeigen"
+    ) ⚠️
+
   a.btn.small(href="/superuser") SuperUser
 
 block content
@@ -33,3 +40,33 @@ block content
             if !d.available
               .note Zutat leer
 
+
+  // WARN-MODAL
+  #warning-modal.modal.hidden
+    .modal-backdrop(onclick="closeWarningModal()")
+    .modal-content
+      h2 ⚠️ Maschinenwarnung
+
+      if status && status.lowStock && status.lowStock.length
+        h3 ❌ Mindestbestand unterschritten
+        .warn-grid
+          each item in status.lowStock
+            - const key = (item.key || item.name || '').toLowerCase();
+            - let icon = '⚠️';
+            - if (key.includes('coffee')) icon = '☕';
+            - else if (key.includes('milk')) icon = '🥛';
+            - else if (key.includes('chocolate')) icon = '🍫';
+
+            .warn-item
+              .warn-icon #{icon}
+              .warn-label #{item.name}
+
+      if status && status.descaleWarning
+        h3 🧼 Entkalkung
+        .warn-item.single
+          .warn-icon 🧼
+          .warn-label
+            | Entkalkung in #{status.descaleIn} Zubereitungen
+
+      .modal-actions
+        button.btn.small(onclick="closeWarningModal()") Schliessen

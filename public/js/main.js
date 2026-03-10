@@ -66,6 +66,15 @@
     return r.json();
   }
 
+
+  window.openWarningModal = function () {
+    document.getElementById('warning-modal')?.classList.remove('hidden');
+  };
+
+  window.closeWarningModal = function () {
+    document.getElementById('warning-modal')?.classList.add('hidden');
+  };
+
   // HOME
   // ───────────────────────────────────────────────────────────────────────────
   async function tickHome() {

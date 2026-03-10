@@ -2,7 +2,7 @@
   "cupPresent": false,
   "ingredients": {
     "milk": 5000,
-    "coffee1": 4790,
+    "coffee1": 400,
     "coffee2": 4950,
     "chocolate": 5000
   },
@@ -19,10 +19,14 @@
     "coffee1": 500,
     "coffee2": 500
   },
-  "descaleIn": 494,
+  "descaleIn": 489,
   "descaleWarning": 50,
   "payment": {
+<<<<<<< HEAD
     "inserted": 5,
+=======
+    "inserted": 2.5,
+>>>>>>> 8145d535964bb8255c2cd729441762fef78d92df
     "change": 0
   },
   "brewing": {
