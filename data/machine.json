@@ -22,7 +22,7 @@
   "descaleIn": 494,
   "descaleWarning": 50,
   "payment": {
-    "inserted": 10,
+    "inserted": 5,
     "change": 0
   },
   "brewing": {
@@ -35,7 +35,7 @@
   "screensaverTimeoutMs": 60000,
   "currency": "CHF",
   "modules": {
-    "chocolate": true,
+    "chocolate": false,
     "secondCoffee": true,
     "beans": [
       {
